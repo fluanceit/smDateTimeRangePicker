@@ -122,7 +122,8 @@
                         initialDate: initialDate,
                         options: options
                     },
-                    skipHide: true
+                    skipHide: true,
+                    multiple: true
                 });
             };
 
