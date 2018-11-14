@@ -4,6 +4,7 @@
             View 12 Hour Mode Time    
     </div>
     <div  layout="row"> 
+        <span>New Timepicker</span>
                 <sm-time-picker-new 
                     fname="Date of Pay" 
                     lable="Date of Pay"
@@ -19,6 +20,7 @@
             View 24 Hour Mode Time    
     </div>
     <div  layout="row"> 
+        <span>New Timepicker</span>
                 <sm-time-picker-new 
                     fname="Date of Pay" 
                     lable="Date of Pay"
@@ -29,7 +31,14 @@
                     is-required="true" 
                     format="HH:mm">
                 </sm-time-picker-new>        
-        </div>   
+        </div>
+    <div layout="row">
+            Time picker as service, click on calender icon
+    </div>
+    <div layour="row">
+            <span>{{vm.currentDate | date:"dd.MM.yyyy HH:mm"}}</span>
+            <a href="" ng-click="vm.showTimePicker($event)"><md-icon md-menu-align-target mo-button md-font-icon="material-icons">watch_later</md-icon></a>
+    </div>
 
     </md-content>
 </form>

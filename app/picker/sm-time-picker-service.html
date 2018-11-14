@@ -1,0 +1,20 @@
+<md-dialog class="picker-container  md-whiteframe-15dp" aria-label="picker">
+    <md-content  layout-xs="column" layout="row"  class="container" >
+        <md-toolbar layout="column" layout-align="center" class="md-height" ng-class="{'portrait': !vm.$mdMedia('gt-xs'),'landscape': vm.$mdMedia('gt-xs')}" >			
+                <!--span class="year-header" layout="row" layout-xs="row">{{vm.viewDate.format('YYYY')}}</span-->
+                <span class="time-header" layout="row" layout-xs="row">{{vm.viewDate.format(vm.headerDispalyFormat)}}</span>
+        </md-toolbar>
+        <div layout="column" class="picker-container">
+                <sm-time
+                    ng-model="vm.initialDate"
+                    data-format="HH:mm"
+                    time-select-call="vm.timeSelected(time)">
+                </sm-time>
+                <div layout="row" ng-hide="vm.closeOnSelect && (vm.mode!=='date-time' || vm.mode!=='time')">
+					<span flex></span>
+                    <md-button class="md-button md-primary" ng-click="vm.closeDateTime()">{{vm.cancelLabel}}</md-button>
+                    <md-button class="md-button md-primary" ng-click="vm.selectedDateTime()">{{vm.okLabel}}</md-button>
+            </div>
+        </div>
+    </md-content>	
+</md-dialog>

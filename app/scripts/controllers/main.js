@@ -1,7 +1,7 @@
 /* global moment */
 'use strict';
 
-function MainCtrl($scope, $timeout, $mdSidenav, $mdUtil, $log, $state, $mdDialog, smDateTimePicker) {
+function MainCtrl($scope, $timeout, $mdSidenav, $mdUtil, $log, $state, $mdDialog, smDateTimePicker, smTimePicker) {
     var vm = this;
     vm.minDate = moment().add(10, 'd').format('MM-DD-YYYY');
     vm.maxDate =  '03-01-2017';//moment().add(1, 'M').format('MM-DD-YYYY');
@@ -36,21 +36,40 @@ function MainCtrl($scope, $timeout, $mdSidenav, $mdUtil, $log, $state, $mdDialog
         vm.dateOfBirth = '10-10-2016 10:10';
     }
 
+    vm.showTimePicker = function(ev) {
+        var options = {
+            mode : 'time',
+            format : 'MM.DD.YYYY HH:mm'
+        }
+
+        //vm.smCurrentDate = new Date();
+        
+        options.targetEvent = ev;
+        smTimePicker(vm.currentDate, options)
+        .then(function(selectedDate) {
+            vm.currentDate = selectedDate;
+        })
+        .catch(function() {
+            // explicit exception handling (1.6+)
+        });
+    }
+
     vm.employee = {};
     vm.employee.default = {
         startDate: moment(),
         endDate: moment().add(1, 'days')
     };
 
-    vm.currentDate = '10-15-2015';
+    //vm.currentDate = '10-15-2015';
+    vm.currentDate = moment();
     var options = {
         mode : 'date',
         view : 'DATE',
-        format : 'MM-DD-YYYY',
+        format : 'DD.MM.YYYY',
         minDate : '03-10-2016',
         maxDate : null,
         weekStartDay :'Sunday',
-        closeOnSelect : true
+        closeOnSelect : false
     }
 
     vm.currentDate1 = moment();
@@ -62,7 +81,7 @@ function MainCtrl($scope, $timeout, $mdSidenav, $mdUtil, $log, $state, $mdDialog
         weekStartDay:'Sunday'
     }
 
-    vm.showCalander = function(ev){
+    vm.showCalendar = function(ev){
         options.targetEvent = ev;
         smDateTimePicker(vm.currentDate, options)
         .then(function(selectedDate) {
@@ -136,5 +155,5 @@ function LeftCtrl($timeout, $mdSidenav, $mdUtil, $log) {
 }
 
 angular.module('demoApp')
-    .controller('MainCtrl', ['$scope', '$timeout', '$mdSidenav', '$mdUtil', '$log', '$state', '$mdDialog', 'smDateTimePicker', MainCtrl])
+    .controller('MainCtrl', ['$scope', '$timeout', '$mdSidenav', '$mdUtil', '$log', '$state', '$mdDialog', 'smDateTimePicker', 'smTimePicker', MainCtrl])
     .controller('LeftCtrl', ['$timeout', '$mdSidenav', '$mdUtil', '$log', LeftCtrl]);

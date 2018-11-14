@@ -104,11 +104,13 @@ $aniimation-duration:			1s;
 						margin:10px;
 						font-size: 16px;
 					}
-					 .date-time-header{
+					.time-header{
+						font-size: 40px;
+						margin: 10px auto;
+					}
+					.date-time-header{
 						font-size: 28px;
-						font-weight: bold;
-						text-align: left;
-						margin:0px 0 15px 10px;
+						margin: 0 0 15px 10px;
 					}
 				}
 			}
@@ -120,10 +122,12 @@ $aniimation-duration:			1s;
 						margin:10px 0;
 						font-size: 16px;
 					}
-					 .date-time-header{
+					.time-header{
+						font-size: 40px;
+						margin: 10px auto;
+					}
+					.date-time-header{
 						font-size: 32px;
-						font-weight: bold;
-						text-align: left;
 					}
 
 				}
