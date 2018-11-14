@@ -68,11 +68,12 @@
           .picker-container .container md-toolbar.md-height.landscape .year-header {
             margin: 10px;
             font-size: 16px; }
+          .picker-container .container md-toolbar.md-height.landscape .time-header {
+            font-size: 40px;
+            margin: 10px auto; }
           .picker-container .container md-toolbar.md-height.landscape .date-time-header {
             font-size: 28px;
-            font-weight: bold;
-            text-align: left;
-            margin: 0px 0 15px 10px; }
+            margin: 0 0 15px 10px; }
       .picker-container .container md-toolbar.md-height {
         padding: 5px 10px; }
         .picker-container .container md-toolbar.md-height.portrait {
@@ -80,10 +81,11 @@
           .picker-container .container md-toolbar.md-height.portrait .year-header {
             margin: 10px 0;
             font-size: 16px; }
+          .picker-container .container md-toolbar.md-height.portrait .time-header {
+            font-size: 40px;
+            margin: 10px auto; }
           .picker-container .container md-toolbar.md-height.portrait .date-time-header {
-            font-size: 32px;
-            font-weight: bold;
-            text-align: left; }
+            font-size: 32px; }
 
 .date-picker {
   width: 300px;
