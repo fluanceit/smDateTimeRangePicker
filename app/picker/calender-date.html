@@ -55,7 +55,7 @@
             <div layout="row" ng-repeat="w in vm.dateCells">
                 <md-button aria-label="vm.currentDate" class="date-cell md-icon-button" ng-class="{'{{vm.colorIntention}} sm-today' : d.today,
 								'active':d.isCurrentMonth,
-								'{{vm.colorIntention}} md-raised selected' :d.date.isSame(vm.currentDate),
+								'{{vm.colorIntention}} md-raised selected' :d.date.isSame(vm.currentDate, 'day') && d.date.isSame(vm.currentDate, 'month') && d.date.isSame(vm.currentDate, 'year'),
 								'disabled':d.isDisabledDate}" ng-click="vm.selectDate(d.date,d.isDisabledDate)" ng-disabled="d.isDisabledDate" ng-repeat="d in w">
                     <span>
                         {{d.dayNum}}

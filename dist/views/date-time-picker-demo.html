@@ -127,6 +127,15 @@
                 <md-button class="md-button" ng-click="vm.changeModelValue()">Chanage Model</md-button>  {{vm.dateOfBirth}} Call back value {{vm.callBackValue }}
             </div>
 
+            <div layout="row">
+                Date and Time pickers on same date: {{vm.dateOfBirth}}
+            </div>
+            <div layout="row">
+                <span>Date of Birth: {{vm.dateOfBirth | date : 'dd-MM-yyyy HH:mm'}}</span>
+                <a href="" ng-click="vm.openDatePicker(vm, 'dateOfBirth', $event)"><md-icon md-menu-align-target mo-button md-font-icon="material-icons">date_range</md-icon></a>
+                <a href="" ng-click="vm.openTimePicker(vm, 'dateOfBirth', $event)"><md-icon md-menu-align-target mo-button md-font-icon="material-icons">watch_later</md-icon></a>
+            </div>
+
        <md-button type="submit" class="md-primary md-raised">save</md-button>
        </md-content>
     </form>

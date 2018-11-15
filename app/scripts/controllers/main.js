@@ -36,6 +36,37 @@ function MainCtrl($scope, $timeout, $mdSidenav, $mdUtil, $log, $state, $mdDialog
         vm.dateOfBirth = '10-10-2016 10:10';
     }
 
+    vm.openDatePicker = function(model, dateField, ev) {
+        var options = {
+            mode: 'date',
+            weekStartDay:'Sunday'
+        }
+
+        options.targetEvent = ev;
+        smDateTimePicker(model[dateField], options)
+        .then(function(selectedDate) {
+            model[dateField] = selectedDate;
+        });
+    }
+
+    vm.openTimePicker = function(model, dateField, ev) {
+        var options = {
+            mode : 'time',
+            format : 'MM.DD.YYYY HH:mm'
+        }
+
+        //vm.smCurrentDate = new Date();
+        
+        options.targetEvent = ev;
+        smTimePicker(model[dateField], options)
+        .then(function(selectedDate) {
+            model[dateField] = selectedDate;
+        })
+        .catch(function() {
+            // explicit exception handling (1.6+)
+        });
+    }
+
     vm.showTimePicker = function(ev) {
         var options = {
             mode : 'time',

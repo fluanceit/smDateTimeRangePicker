@@ -116,7 +116,7 @@
 	TimePickerCtrl.prototype.selectDate = function(d, isDisabled){
 		var self = this;
 		if (isDisabled) return;
-		self.currentDate = d;
+		self.currentDate = self.currentDate.hour(d.hour()).minutes(d.minutes());
 
 		self.$scope.$emit('calender:date-selected');
 

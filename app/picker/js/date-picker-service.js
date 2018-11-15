@@ -17,8 +17,15 @@
             self.closeOnSelect =isExist(self.options.closeOnSelect, false);
         }
 
-        if(!angular.isObject(self.initialDate)){
+        // use MomentJS internally.
+        // initialDate is-a "String"
+        if(!angular.isObject(self.initialDate)) {
             self.initialDate = moment(self.initialDate, self.format);
+            self.selectedDate = self.initialDate;
+        }
+        // initialDate is-a "Date"
+        else {
+            self.initialDate = moment(self.initialDate);
             self.selectedDate = self.initialDate;
         }
 
@@ -62,7 +69,8 @@
                     self.selectedDate = self.initialDate;
                 }
                 //removeMask();
-                $mdDialog.hide(self.selectedDate.format(self.format));
+                //$mdDialog.hide(self.selectedDate.format(self.format));
+                $mdDialog.hide(self.selectedDate.toDate()); // return Date object
             }
         }
 
@@ -89,7 +97,8 @@
             if(angular.isUndefined(self.selectedDate)){
                 self.selectedDate= self.currentDate;
             }
-            $mdDialog.hide(self.selectedDate.format(self.format));
+            //$mdDialog.hide(self.selectedDate.format(self.format));
+            $mdDialog.hide(self.selectedDate.toDate()); // return Date object
             removeMask();
         }
 
@@ -107,7 +116,7 @@
         this.$get = ['$mdDialog', function($mdDialog) {
 
             var datePicker = function(initialDate, options) {
-                if (angular.isUndefined(initialDate)) initialDate = moment();
+                if (angular.isUndefined(initialDate)) initialDate = moment().toDate();
 
                 if (!angular.isObject(options)) options = {};
 

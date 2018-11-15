@@ -38,81 +38,87 @@
         self.picker = picker;
         self.dayHeader = self.picker.dayHeader;
         self.colorIntention = picker.colorIntention;        
-        self.initialDate = $scope.initialDate;
+
         self.viewModeSmall = $mdMedia('xs');
-        self.startDay = angular.isUndefined($scope.weekStartDay) || $scope.weekStartDay==='' ? 'Sunday' : $scope.weekStartDay ;
-        self.minDate = $scope.minDate || undefined;			//Minimum date
-        self.maxDate = $scope.maxDate || undefined;			//Maximum date
-        self.mode = angular.isUndefined($scope.mode) ? 'DATE' : $scope.mode;
-        self.format = angular.isUndefined($scope.format)? picker.format : $scope.format;
-        self.restrictToMinDate = angular.isUndefined(self.minDate) ? false : true;
-        self.restrictToMaxDate = angular.isUndefined(self.maxDate) ? false : true;
+
         self.stopScrollPrevious =false;
         self.stopScrollNext = false;
-        self.disableYearSelection = $scope.disableYearSelection;
+
         self.monthCells=[];
         self.dateCellHeader= [];
         self.dateCells = [];
         self.monthList = moment.monthsShort();
         self.moveCalenderAnimation='';
 
-        self.format = angular.isUndefined(self.format) ? 'MM-DD-YYYY': self.format;
-        self.initialDate =	angular.isUndefined(self.initialDate) ? moment() : moment(self.initialDate, self.format);
-
-        self.currentDate = self.initialDate.clone();
         self.minYear = 1900;
         self.maxYear = 3000;
 
-        if(self.restrictToMinDate){
-             if(!moment.isMoment(self.minDate)){
-                self.minDate = moment(self.minDate, self.format);
-            }
-            /* the below code is giving some errors. It was added by Pablo Reyes, but I still need to check what
-            he intended to fix.
-            if(moment.isMoment(self.minDate)){
-                self.minDate = self.minDate.subtract(1, 'd').startOf('day');
-            }else{
-                self.minDate = moment(self.minDate, self.format).subtract(1, 'd').startOf('day');
-            }
-            self.minYear = self.minDate.year();
-            */
-        }
+        // use component lifecycle hooks
+        self.$onInit = onInit;
+        
+        function onInit() {
+            self.initialDate = $scope.initialDate;
+            self.startDay = angular.isUndefined($scope.weekStartDay) || $scope.weekStartDay==='' ? 'Sunday' : $scope.weekStartDay ;
+            self.minDate = $scope.minDate || undefined;			//Minimum date
+            self.maxDate = $scope.maxDate || undefined;			//Maximum date
+            self.mode = angular.isUndefined($scope.mode) ? 'DATE' : $scope.mode;
+            self.format = angular.isUndefined($scope.format)? picker.format : $scope.format;
+            self.restrictToMinDate = angular.isUndefined(self.minDate) ? false : true;
+            self.restrictToMaxDate = angular.isUndefined(self.maxDate) ? false : true;
+            self.disableYearSelection = $scope.disableYearSelection;
+            self.format = angular.isUndefined(self.format) ? 'MM-DD-YYYY': self.format;
+            self.initialDate =	angular.isUndefined(self.initialDate) ? moment() : moment(self.initialDate, self.format);
+            self.currentDate = self.initialDate.clone();
+    
+            if(self.restrictToMinDate){
+                if(!moment.isMoment(self.minDate)){
+                   self.minDate = moment(self.minDate, self.format);
+               }
+               /* the below code is giving some errors. It was added by Pablo Reyes, but I still need to check what
+               he intended to fix.
+               if(moment.isMoment(self.minDate)){
+                   self.minDate = self.minDate.subtract(1, 'd').startOf('day');
+               }else{
+                   self.minDate = moment(self.minDate, self.format).subtract(1, 'd').startOf('day');
+               }
+               self.minYear = self.minDate.year();
+               */
+           }
 
-        if(self.restrictToMaxDate) {
-            if(!moment.isMoment(self.maxDate)){
-                self.maxDate = moment(self.maxDate, self.format).startOf('day');
-                self.maxYear = self.maxDate.year();
-            }
-        }
-
-
-
-        self.yearItems = {
-            currentIndex_: 1,
-            PAGE_SIZE: 7,
-            START: self.minYear,
-            getItemAtIndex: function(index) {
-                if(!this.START+ index<=(self.maxYear)) {
-                    return (this.START+ index); 
-                }else{
-                    return this.START ;
+            if(self.restrictToMaxDate) {
+                if(!moment.isMoment(self.maxDate)){
+                    self.maxDate = moment(self.maxDate, self.format).startOf('day');
+                    self.maxYear = self.maxDate.year();
                 }
-
-                if(this.currentIndex_ < index){
-                    this.currentIndex_ = index;
-                    return this.START + index;                    
-                } 
-                if(this.currentIndex_ < index){
-                    this.currentIndex_ = index;
-                }
-                return this.START + index;
-            },
-            getLength: function() {
-                return this.currentIndex_ + Math.floor(this.PAGE_SIZE / 2);
             }
-        };
-
-        self.init();
+    
+            self.yearItems = {
+                currentIndex_: 1,
+                PAGE_SIZE: 7,
+                START: self.minYear,
+                getItemAtIndex: function(index) {
+                    if(!this.START+ index<=(self.maxYear)) {
+                        return (this.START+ index); 
+                    }else{
+                        return this.START ;
+                    }
+    
+                    if(this.currentIndex_ < index){
+                        this.currentIndex_ = index;
+                        return this.START + index;                    
+                    } 
+                    if(this.currentIndex_ < index){
+                        this.currentIndex_ = index;
+                    }
+                    return this.START + index;
+                },
+                getLength: function() {
+                    return this.currentIndex_ + Math.floor(this.PAGE_SIZE / 2);
+                }
+            };
+    
+			self.init();
+		}
     };
 
     CalenderCtrl.prototype.setInitDate = function(dt) {
@@ -156,8 +162,6 @@
         self.buildMonthCells();
         self.setView();
         self.showYear();
-
-
     };
 
     CalenderCtrl.prototype.setView = function(){
@@ -275,9 +279,9 @@
         if (isDisabled) {
             return;
         }
-        self.currentDate = d;
-        self.$scope.dateSelectCall({date:d});
-        self.setNgModelValue(d);
+        self.currentDate = self.currentDate.date(d.date()).month(d.month()).year(d.year()); // don't overwrite time
+        self.$scope.dateSelectCall({date:self.currentDate});
+        self.setNgModelValue(self.currentDate);
         self.$scope.$emit('calender:date-selected');
 
     };
