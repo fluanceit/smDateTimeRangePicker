@@ -8,7 +8,7 @@
 			replace:true,
 			require: ['^ngModel', 'smTime'],
 			scope :{
-				initialTime : '@',
+				initialDate : '=',
 				format:'@',
 				timeSelectCall : '&'
 			},
@@ -26,6 +26,7 @@
 
 	var TimePickerCtrl = function($scope, picker){
 		var self = this;
+		self.MIDDLE_INDEX = 4;
 		self.uid = Math.random().toString(36).substr(2, 5);
 		self.$scope = $scope;
 		self.picker = picker;
@@ -42,7 +43,7 @@
 		self.$onInit = onInit;
 
 		function onInit() {
-			self.initialDate = $scope.initialTime; 	//if calender to be  initiated with specific date
+			self.initialDate = $scope.initialDate; 	//if calender to be  initiated with specific date
 			self.format = angular.isUndefined(self.format) ? 'HH:mm': self.format;
 			self.initialDate =	angular.isUndefined(self.initialDate)? moment() : moment(self.initialDate, self.format);
 			self.currentDate = self.initialDate.clone();
@@ -62,8 +63,8 @@
 	TimePickerCtrl.prototype.showHour = function() {
 		var self = this;
 
-		self.hourTopIndex = self.initialDate.hour();
-		self.minuteTopIndex = self.initialDate.minute();
+		self.hourTopIndex = ((self.initialDate.hour()-self.MIDDLE_INDEX) >= 0) ? (self.initialDate.hour()-self.MIDDLE_INDEX) : 0;
+		self.minuteTopIndex = ((self.initialDate.minute()-self.MIDDLE_INDEX) >= 0) ? (self.initialDate.minute()-self.MIDDLE_INDEX) : 0;
 		//self.minuteTopIndex	= (self.initialDate.minute() - 0) + Math.floor(7 / 2);
 
 		//self.yearTopIndex = (self.initialDate.year() - self.yearItems.START) + Math.floor(self.yearItems.PAGE_SIZE / 2);
@@ -90,7 +91,7 @@
 
 	TimePickerCtrl.prototype.buildHourCells = function(){
 		var self = this;
-		self.hourTopIndex = self.initialDate.hour();
+		self.hourTopIndex = ((self.initialDate.hour()-self.MIDDLE_INDEX) >= 0) ? (self.initialDate.hour()-self.MIDDLE_INDEX) : 0;
 		for (var i = 0 ; i <= 23; i++) {
 			var hour={
 				hour : i,
@@ -102,7 +103,7 @@
 
 	TimePickerCtrl.prototype.buildMinuteCells = function(){
 		var self = this;
-		self.minuteTopIndex = self.initialDate.minute();
+		self.minuteTopIndex = ((self.initialDate.minute()-self.MIDDLE_INDEX) >= 0) ? (self.initialDate.minute()-self.MIDDLE_INDEX) : 0;
 		for (var i = 0 ; i <= 59; i++) {
 			var minute = {
 				minute : i,

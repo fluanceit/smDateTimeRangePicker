@@ -174,10 +174,13 @@
       margin: 0; }
   .time-picker .time-md-repeat {
     width: 70px;
-    height: 239px; }
+    height: 274px; }
     .time-picker .time-md-repeat .repeated-item {
       width: 34px;
-      margin: 0 auto; }
+      margin: 0 auto;
+      box-sizing: border-box;
+      height: 34px;
+      overflow: hidden; }
       .time-picker .time-md-repeat .repeated-item > .md-button {
         margin: 2px; }
         .time-picker .time-md-repeat .repeated-item > .md-button.md-icon-button {
@@ -543,10 +546,13 @@
       margin: 0; }
   .time-picker .time-md-repeat {
     width: 70px;
-    height: 239px; }
+    height: 274px; }
     .time-picker .time-md-repeat .repeated-item {
       width: 34px;
-      margin: 0 auto; }
+      margin: 0 auto;
+      box-sizing: border-box;
+      height: 34px;
+      overflow: hidden; }
       .time-picker .time-md-repeat .repeated-item > .md-button {
         margin: 2px; }
         .time-picker .time-md-repeat .repeated-item > .md-button.md-icon-button {

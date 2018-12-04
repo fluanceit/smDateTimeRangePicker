@@ -267,10 +267,13 @@ $aniimation-duration:			1s;
 	}
 	.time-md-repeat{
 		width: 70px;
-		height: 239px;
+		height: 274px;
 		.repeated-item{
 			width: 34px;
 			margin:0 auto;
+			box-sizing: border-box;
+			height: 34px;
+			overflow: hidden;
 			> .md-button{
 				margin: 2px;	
 				&.md-icon-button{

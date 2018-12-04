@@ -6,7 +6,8 @@
         </md-toolbar>
         <div layout="column" class="picker-container">
                 <sm-time
-                    ng-model="vm.initialDate"
+                    ng-model="vm.selectedDate"
+                    initial-date="vm.initialDate"
                     data-format="HH:mm"
                     time-select-call="vm.timeSelected(time)">
                 </sm-time>

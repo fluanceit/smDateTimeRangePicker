@@ -10,6 +10,7 @@ function MainCtrl($scope, $timeout, $mdSidenav, $mdUtil, $log, $state, $mdDialog
         startDate: new Date(),
         endDate: new Date()
     };
+    vm.dateOfBirth2;
 
     vm.hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
