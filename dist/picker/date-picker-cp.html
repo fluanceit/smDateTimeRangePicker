@@ -1,0 +1,47 @@
+<div class="picker-container">
+        <md-content  layout-xs="column" layout="row"  class="container" >
+            <md-toolbar class="md-height {{vm.colorIntention}}" ng-class="{'portrait': !vm.$mdMedia('gt-xs'),'landscape': vm.$mdMedia('gt-xs')} " >	
+                    <span class="year-header" layout="row" layout-xs="row">{{vm.currentDate.format('YYYY')}}</span>
+                    <span class="date-time-header" layout="row" layout-xs="row">{{vm.currentDate.format(vm.headerDispalyFormat)}}</span>
+            </md-toolbar>
+            <div layout="column" class="picker-container" >
+                <div ng-if="vm.view==='DATE'" >
+                    <sm-calendar-cp 
+                        data-initial-date="vm.selectedDate"					
+                        data-id="{{vm.fname}}Picker" 
+                        data-mode="{{vm.mode}}" 
+                        data-min-date="vm.minDate" 
+                        data-max-date="vm.maxDate" 
+                        data-close-on-select="vm.closeOnSelect"				 
+                        data-format="{{vm.format}}" 
+                        data-disable-year-selection="{{vm.disableYearSelection}}" 
+                        data-week-start-day="{{vm.weekStartDay}}"
+                        data-date-select-call="vm.dateSelected(date)">
+                    </sm-calendar-cp>
+                </div>
+                <div ng-if="vm.view==='TIME'">
+                    <sm-time-cp
+                        data-initial-date="vm.selectedTime"
+                        data-format="HH:mm"
+                        data-set-time-on-single-select="vm.setTimeOnSingleSelect"
+                        data-time-select-call="vm.timeSelected(time)">
+                    </sm-time-cp>
+                </div>
+                <div layout="row" ng-hide="(vm.closeOnSelect === 'true') && (vm.mode!=='date-time' || vm.mode!=='time')">
+                        <div ng-show="vm.mode==='date-time' && !vm.closeOnSelect">
+                            <md-button class="md-icon-button {{vm.colorIntention}}" ng-show="vm.view==='DATE'" ng-click="vm.view='TIME'">
+                                <md-icon md-font-icon="material-icons md-primary">access_time</md-icon>
+                            </md-button>
+                            <md-button class="md-icon-button {{vm.colorIntention}}" ng-show="vm.view==='TIME'" ng-click="vm.view='DATE'">
+                                <md-icon md-font-icon="material-icons md-primary">date_range</md-icon>
+                            </md-button>
+                        </div>		
+                        <span flex></span>
+                        <div ng-show="!vm.closeOnSelect">
+                            <md-button class="md-button buttonSelect {{vm.colorIntention}}" ng-click="vm.closeDateTime()">{{vm.cancelLabel}}</md-button>
+                            <md-button class="md-button buttonCancel {{vm.colorIntention}}" ng-click="vm.selectedDateTime()">{{vm.okLabel}}</md-button>
+                        </div>
+                </div>
+            </div>
+        </md-content>	
+    </div>

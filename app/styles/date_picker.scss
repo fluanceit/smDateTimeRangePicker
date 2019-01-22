@@ -254,8 +254,9 @@ $aniimation-duration:			1s;
 
 .time-picker{
 	width: 300px;
+	height: 270px;
 	.navigation{
-		height: 25px;
+		height: 35px;
 		.md-button{
 			text-transform: capitalize;
 			font-weight: bold;
@@ -267,7 +268,7 @@ $aniimation-duration:			1s;
 	}
 	.time-md-repeat{
 		width: 70px;
-		height: 274px;
+		height: 235px;
 		.repeated-item{
 			width: 34px;
 			margin:0 auto;

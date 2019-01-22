@@ -20,7 +20,7 @@ angular
 
     pickerProvider.setOkLabel('Save');
    
-    pickerProvider.setColorIntention('md-accent');
+    pickerProvider.setColorIntention('md-primary');
    
 
     $urlRouterProvider.otherwise('/home');

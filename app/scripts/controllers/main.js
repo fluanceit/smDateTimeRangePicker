@@ -86,7 +86,13 @@ function MainCtrl($scope, $timeout, $mdSidenav, $mdUtil, $log, $state, $mdDialog
         });
     }
 
-    vm.employee = {};
+    vm.employee = {
+        //birthDate: moment("13.11.1955 14:30", "DD.MM.YYYY HH:mm")
+        birthDate: moment("13.11.2018 10:26", "DD.MM.YYYY HH:mm").toDate(),
+        visitDate: moment("13.11.2019 14:30", "DD.MM.YYYY HH:mm").toDate()
+        //visitDate: undefined
+        //visitDate: null // breaks calendar (empty)
+    };
     vm.employee.default = {
         startDate: moment(),
         endDate: moment().add(1, 'days')
@@ -187,5 +193,12 @@ function LeftCtrl($timeout, $mdSidenav, $mdUtil, $log) {
 }
 
 angular.module('demoApp')
+    .config(['pickerProvider',
+        function(pickerProvider) {
+            pickerProvider.setCustomHeader(
+                {date: 'DD.MM', time: 'HH:mm', dateTime: 'DD.MM HH:mm'}
+            );
+        } 
+    ])
     .controller('MainCtrl', ['$scope', '$timeout', '$mdSidenav', '$mdUtil', '$log', '$state', '$mdDialog', 'smDateTimePicker', 'smTimePicker', MainCtrl])
     .controller('LeftCtrl', ['$timeout', '$mdSidenav', '$mdUtil', '$log', LeftCtrl]);

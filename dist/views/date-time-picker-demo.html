@@ -13,27 +13,48 @@
             <div layout="row">
                 Date picker, Close on date select only works with &nbsp;<b> Date Picker </b>&nbsp; mode with attribute &nbsp;<b> close-on-select="true" &nbsp;</b> without floating label
             </div>
+            {{vm.employee.birthDate}}
             <div   layout="row">
-                    <sm-date-time-picker
-                        fname="exitDate"
-                        label="Date of Exit"
-                        ng-model="vm.employee.exitDate"
+                    <sm-date-time-picker-component
+                    fname="birthDate"
+                    lable="Date of Birth"
+                    form="empForm"
+                    ng-model="vm.employee.birthDate"
+                    flex="20"
+                    flex-sm="100"
+                    flex-xs="100"
+                    is-required="true"
+                    format="DD.MM.YYYY HH:mm"
+                    mode="date-time"
+                    week-start-day="Monday">
+                </sm-date-time-picker-component>
+            </div>
+            <div layout="row">
+                    Date picker CP: <b> disable="false"</b>
+            </div>
+            <div   layout="row">
+                <span>{{vm.employee.visitDate | date: 'dd.MM.yyyy HH:mm'}}</span>
+                    <sm-date-time-picker-component
+                        fname="visitDate"
+                        label="Date of Visit"
+                        ng-model="vm.employee.visitDate"
                         flex="50"
                         flex-sm="100"
-                        no-floating-label="true"
                         flex-xs="100"
-                        close-on-select="true"
-                        format="MM-DD-YYYY"
+                        close-on-select="false"
+                        change-view-on-select="false"
+                        is-required="{{true}}"
+                        disable="false"
+                        format="DD.MM.YYYY HH:mm"
                         mode="date-time"
                         week-start-day="Monday">
-                    </sm-date-time-picker>
-
+                    </sm-date-time-picker-component>
             </div>
             <div layout="row">
                 Min date set to {{vm.minDate}}: <b>min-date="{{vm.minDate}}"</b>
             </div>
             <div   layout="row">
-                    <sm-date-time-picker
+                    <sm-date-time-picker-cp
                         fname="Date of Pay"
                         label="Date of Pay"
                         min-date="{{vm.minDate}}"
@@ -42,11 +63,11 @@
                         is-required="{{true}}"
                         format="MM-DD-YYYY"
                         week-start-day="Sunday">
-                    </sm-date-time-picker>
+                    </sm-date-time-picker-cp>
                 {{vm.employee.dateOfPay}}
             </div>
             <div layout="row">
-                Date picker: <b> disable="true"</b>
+                Date picker: <b> disable="false"</b>
             </div>
             <div   layout="row">
                     <sm-date-time-picker
@@ -56,10 +77,11 @@
                         flex="50"
                         flex-sm="100"
                         flex-xs="100"
-                        close-on-select="true"
+                        close-on-select="false"
                         is-required="{{true}}"
-                        disable="true"
+                        disable="false"
                         format="MM-DD-YYYY"
+                        mode="date-time"
                         week-start-day="Monday">
                     </sm-date-time-picker>
             </div>
@@ -132,8 +154,8 @@
             </div>
             <div layout="row">
                 <span>Date of Birth: {{vm.dateOfBirth | date : 'dd-MM-yyyy HH:mm'}}</span>
-                <a href="" ng-click="vm.openDatePicker(vm, 'dateOfBirth2', $event)"><md-icon md-menu-align-target mo-button md-font-icon="material-icons">date_range</md-icon></a>
-                <a href="" ng-click="vm.openTimePicker(vm, 'dateOfBirth2', $event)"><md-icon md-menu-align-target mo-button md-font-icon="material-icons">watch_later</md-icon></a>
+                <a href="" ng-click="vm.openDatePicker(vm, 'dateOfBirth', $event)"><md-icon md-menu-align-target mo-button md-font-icon="material-icons">date_range</md-icon></a>
+                <a href="" ng-click="vm.openTimePicker(vm, 'dateOfBirth', $event)"><md-icon md-menu-align-target mo-button md-font-icon="material-icons">watch_later</md-icon></a>
             </div>
 
        <md-button type="submit" class="md-primary md-raised">save</md-button>

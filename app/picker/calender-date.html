@@ -3,7 +3,7 @@
         <a href="javascript:void(0)" class="cal-link" ng-click="vm.view = 'DATE'">Back to calendar</a>
         <md-virtual-repeat-container class="year-md-repeat" id="year-container" md-top-index="vm.yearTopIndex">
             <div class="repeated-item" md-on-demand="" md-virtual-repeat="yr in vm.yearItems">
-                    <div class="year" ng-class="{'md-accent': yr === vm.currentDate.year(), 'selected-year md-primary ':vm.initialDate.year()===yr}">
+                    <div class="year" ng-class="{'md-primary': yr === vm.currentDate.year(), 'selected-year md-primary ':vm.initialDate.year()===yr}">
                          <span class="year-num" ng-click="vm.changeYear(yr,vm.currentDate.month())">{{yr}}</span> 
                          <div class="month-list">
                             <div class="month-row" >
@@ -54,9 +54,9 @@
         <div class="date-cell-row" md-swipe-left="vm.changePeriod('n')" md-swipe-right="vm.changePeriod('p')" ng-class="vm.moveCalenderAnimation">
             <div layout="row" ng-repeat="w in vm.dateCells">
                 <md-button aria-label="vm.currentDate" class="date-cell md-icon-button" ng-class="{'{{vm.colorIntention}} sm-today' : d.today,
-								'active':d.isCurrentMonth,
-								'{{vm.colorIntention}} md-raised selected' :d.date.isSame(vm.currentDate, 'day') && d.date.isSame(vm.currentDate, 'month') && d.date.isSame(vm.currentDate, 'year'),
-								'disabled':d.isDisabledDate}" ng-click="vm.selectDate(d.date,d.isDisabledDate)" ng-disabled="d.isDisabledDate" ng-repeat="d in w">
+								'active': d.isCurrentMonth,
+								'{{vm.colorIntention}} md-raised selected': d.date.isSame(vm.currentDate, 'day') && d.date.isSame(vm.currentDate, 'month') && d.date.isSame(vm.currentDate, 'year'),
+								'disabled': d.isDisabledDate}" ng-click="vm.selectDate(d.date,d.isDisabledDate)" ng-disabled="d.isDisabledDate" ng-repeat="d in w">
                     <span>
                         {{d.dayNum}}
                     </span>

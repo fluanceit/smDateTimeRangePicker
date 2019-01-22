@@ -8,6 +8,1123 @@ if (typeof moment === 'undefined') {
 
 (function() {
 
+(function(){
+
+    'use strict';
+    
+    function Calender($timeout,picker){
+        return {
+          restrict : 'E',
+          replace:true,
+          require: ['^ngModel', 'smCalendarComponent'],
+          scope :{
+                  initialDate : "=ngModel",
+                  minDate:"=",
+                  maxDate:"=",
+                  format:"@",
+                  mode:"@",
+                  startView:"@",	      	
+                  weekStartDay:"@"
+            },
+            controller:["$scope","$timeout","picker","$mdMedia",CalenderCtrl],
+            controllerAs : 'vm',
+            templateUrl:"picker/calendar-date-component.html",
+            link : function(scope,element,att,ctrls){
+    
+                var ngModelCtrl = ctrls[0];
+                var calCtrl = ctrls[1];
+                calCtrl.configureNgModel(ngModelCtrl);
+    
+                scope.$on('$destroy',function(){
+                   element.remove();
+                });
+            }      
+        }
+    }
+    
+    var CalenderCtrl = function($scope,$timeout,picker,$mdMedia){
+        var self  = this;
+    
+        self.$onInit = onInit;
+
+        function onInit() {
+            self.$scope = $scope;
+            self.$timeout = $timeout;
+            self.picker = picker;
+            self.dayHeader = self.picker.dayHeader;
+            //if calender to be  initiated with specific date       
+            self.initialDate = $scope.initialDate; 	
+            self.viewModeSmall = $mdMedia('xs');
+            //if calender to be start on specific day default is sunday
+            self.startDay = angular.isUndefined($scope.weekStartDay) || $scope.weekStartDay==='' ? 'Sunday' : $scope.weekStartDay ;	   	
+            self.minDate = $scope.minDate;			//Minimum date 
+            self.maxDate = $scope.maxDate;			//Maximum date 
+            self.mode = angular.isUndefined($scope.mode) ? 'DATE' : $scope.mode;
+            self.format = $scope.format;
+            self.restrictToMinDate = angular.isUndefined($scope.minDate) ? false : true;
+            self.restrictToMaxDate = angular.isUndefined($scope.maxDate) ? false : true;
+            self.stopScrollPrevious =false;
+            self.stopScrollNext = false;
+            self.monthCells=[];
+            self.dateCellHeader= [];	
+            self.dateCells = [];
+            self.monthList = picker.monthNames;
+            self.moveCalenderAnimation='';
+            self.format = angular.isUndefined(self.format) ? 'MM-DD-YYYY': self.format;
+            self.initialDate =	angular.isUndefined(self.initialDate)? moment() : moment(self.initialDate,self.format);
+            self.currentDate = self.initialDate.clone();
+            if(self.restrictToMinDate) 
+                self.minDate = moment(self.minDate, self.format);
+            if(self.restrictToMaxDate) 
+                self.maxDate = moment(self.maxDate, self.format);
+            self.yearItems = {
+                currentIndex_: 0,
+                PAGE_SIZE: 7,
+                START: 1900,
+                getItemAtIndex: function(index) {
+                    if(this.currentIndex_ < index)
+                        this.currentIndex_ = index;
+                    return this.START + index;
+                },
+                getLength: function() {
+                    return this.currentIndex_ + Math.floor(this.PAGE_SIZE / 2);
+                }
+            };	
+            self.init();
+
+            $scope.$on('calendar:show', function(event, params) {
+                console.log('Calendar initialDate', $scope.initialDate, params.initialDate);
+                self.initialDate =	angular.isUndefined(params.initialDate)? moment() : moment(params.initialDate,self.format);
+                self.currentDate = self.initialDate.clone();
+                self.monthCells=[];
+                self.dateCellHeader= [];	
+                self.dateCells = [];
+                self.init();
+            })
+        }
+    }
+    
+    
+    CalenderCtrl.prototype.configureNgModel = function(ngModelCtrl) {
+        this.ngModelCtrl = ngModelCtrl;
+        var self = this;
+        ngModelCtrl.$render = function() {
+          self.ngModelCtrl.$viewValue= self.currentDate;
+        };
+      };
+    
+    
+      CalenderCtrl.prototype.setNgModelValue = function(date) {
+        var self = this;
+        self.ngModelCtrl.$setViewValue(date);
+        self.ngModelCtrl.$render();
+      };
+    
+    CalenderCtrl.prototype.init = function(){
+        var self = this;
+        self.buildDateCells();
+        self.buildDateCellHeader();
+        self.buildMonthCells();
+        self.setView()
+        self.showYear();
+    
+    
+    };
+    
+    CalenderCtrl.prototype.setView = function(){
+        var self = this;
+        self.headerDispalyFormat = "ddd, MMM DD";	
+        switch(self.mode) {
+            case 'date-time':
+                self.view = 'DATE'
+                self.headerDispalyFormat = "ddd, MMM DD HH:mm";			
+                break;
+            case 'time':
+                self.view = 'HOUR';
+                self.headerDispalyFormat = "HH:mm";
+                break;
+            default:
+                self.view = 'DATE';
+        }	
+    }
+    
+    CalenderCtrl.prototype.showYear = function() { 
+        var self = this;
+        self.yearTopIndex = (self.initialDate.year() - self.yearItems.START) + Math.floor(self.yearItems.PAGE_SIZE / 2);
+        self.yearItems.currentIndex_ = (self.initialDate.year() - self.yearItems.START) + 1;
+    };
+    
+    
+    CalenderCtrl.prototype.buildMonthCells = function(){
+        var self = this;
+        self.monthCells = moment.months();
+    };
+    
+    CalenderCtrl.prototype.buildDateCells = function(){
+        var self = this;
+        var currentMonth = self.initialDate.month();
+        var calStartDate  = self.initialDate.clone().date(0).day(self.startDay);
+        var weekend = false;
+        var isDisabledDate =false;
+    
+        /*
+            Check if min date is greater than first date of month
+            if true than set stopScrollPrevious=true 
+        */
+        if(!angular.isUndefined(self.minDate)){	
+            self.stopScrollPrevious	 = self.minDate.unix() > calStartDate.unix();
+        }
+    
+        self.dateCells =[];
+        for (var i = 0; i < 6; i++) {
+            var week = [];
+            for (var j = 0; j < 7; j++) {
+                
+                var isCurrentMonth = (calStartDate.month()=== currentMonth);	
+                
+    
+                if(isCurrentMonth){isDisabledDate=false}else{isDisabledDate=true};
+                
+    
+                if(self.restrictToMinDate && !angular.isUndefined(self.minDate) && !isDisabledDate)
+                    isDisabledDate = self.minDate.isAfter(calStartDate);
+                
+                if(self.restrictToMaxDate && !angular.isUndefined(self.maxDate) && !isDisabledDate)
+                    isDisabledDate = self.maxDate.isBefore(calStartDate);
+                
+    
+                var  day = {
+                        date : calStartDate.clone(),
+                        dayNum: isCurrentMonth ? calStartDate.date() :"",
+                        month : calStartDate.month(),
+                        today: calStartDate.isSame(moment(),'day') && calStartDate.isSame(moment(),'month'),
+                        year : calStartDate.year(),
+                        dayName : calStartDate.format('dddd'),
+                        isWeekEnd : weekend,
+                        isDisabledDate : isDisabledDate,
+                        isCurrentMonth : isCurrentMonth
+                };
+                
+                week.push(day);
+                calStartDate.add(1,'d')
+            }
+            self.dateCells.push(week);
+        }
+        /*
+            Check if max date is greater than first date of month
+            if true than set stopScrollPrevious=true 
+        */
+        if(self.restrictToMaxDate && !angular.isUndefined(self.maxDate)){	
+            self.stopScrollNext	= self.maxDate.unix() < calStartDate.unix();
+        }
+    
+        if(self.dateCells[0][6].isDisabledDate && !self.dateCells[0][6].isCurrentMonth){
+            self.dateCells[0].splice(0);
+        }
+    
+    };
+    
+    CalenderCtrl.prototype.changePeriod = function(c){
+        var self = this;
+        if(c === 'p'){
+            if(self.stopScrollPrevious) return;
+            self.moveCalenderAnimation='slideLeft';
+            self.initialDate.subtract(1,'M');
+        }else{
+            if(self.stopScrollNext) return;
+            self.moveCalenderAnimation='slideRight';
+            self.initialDate.add(1,'M');
+        }
+    
+        self.buildDateCells();
+        self.$timeout(function(){
+            self.moveCalenderAnimation='';
+        },500);
+    };
+    
+    
+    CalenderCtrl.prototype.selectDate = function(d,isDisabled){
+        var self = this;
+        if (isDisabled) return;
+        self.currentDate = d;
+        self.setNgModelValue(d);
+    
+        self.$scope.$emit('calender:date-selected');
+    }
+    
+    
+    CalenderCtrl.prototype.buildDateCellHeader = function(startFrom){
+        var self = this;
+        var daysByName = self.picker.daysNames;
+        
+        var keys = [];
+        for (var key in daysByName) {
+            keys.push(key)
+        }
+        var startIndex = moment().day(self.startDay).day(), count = 0;
+        for (var key in daysByName) {
+    
+            self.dateCellHeader.push(daysByName[ keys[ (count + startIndex) % (keys.length)] ]);
+            count++; // Don't forget to increase count.
+        }  
+    }
+    /*
+        Month Picker
+    */
+    
+    CalenderCtrl.prototype.changeView = function(view){
+        var self = this;
+        self.view =view;
+        if(self.view==='YEAR_MONTH'){
+            self.showYear();
+        }
+    }
+    
+    /*
+        Year Picker
+    */
+    
+    
+    CalenderCtrl.prototype.changeYear = function(yr){
+        var self = this;
+        self.initialDate.year(yr);
+        self.buildDateCells();
+        self.view='DATE';	
+    }
+    
+    /*
+        Hour and Time
+    */
+    
+    
+    CalenderCtrl.prototype.setHour = function(h){
+        var self = this;
+        self.currentDate.hour(h);
+    }
+    
+    CalenderCtrl.prototype.setMinute = function(m){
+        var self = this;
+        self.currentDate.minute(m);
+    }
+    
+    CalenderCtrl.prototype.selectedDateTime = function(){
+        var self = this;
+        self.setNgModelValue(self.currentDate);
+        if(self.mode === 'time') 
+            self.view='HOUR' 
+        else 
+            self.view='DATE';
+        self.$scope.$emit('calender:close');			
+    }
+    
+    CalenderCtrl.prototype.closeDateTime = function(){
+        var self = this;
+        if(self.mode === 'time') 
+            self.view='HOUR' 
+        else 
+            self.view='DATE';
+        self.$scope.$emit('calender:close');
+    }
+    
+    
+    /*
+    function DateTimePicker($mdUtil,$mdMedia,$document,$timeout,picker){
+        return {
+          restrict : 'E',
+          replace:true,
+          scope :{
+            value: '=',
+            startDate : '@',
+            weekStartDay : '@',
+            startView:"@",                  
+            mode : '@',
+            format : '@',
+            minDate : '@',
+            maxDate : '@',
+            fname : "@",
+            lable : "@",
+            isRequired : '@',
+            disable : '=',
+            form : '=',
+            closeOnSelect:"@"
+          },
+          template: '  <md-input-container>'
+                    +'    <label for="{{fname}}">{{lable }}</label>'
+                    +'    <input name="{{fname}}" ng-model="value" ng-readonly="true"'
+                    +'             type="text" placeholde="{{lable}}"'
+                    +'             aria-label="{{fname}}" data-ng-required="isRequired" ng-disabled="disable"'
+                    +'             ng-focus="show()" server-error class="sm-input-container">'
+                    +'    <div ng-messages="form[fname].$error" ng-if="form[fname].$touched">'
+                    +'    		<div ng-messages-include="{{ngMassagedTempaltePath}}"></div>'
+                    +'    </div>'
+                    +'    	<div id="picker" class="sm-calender-pane md-whiteframe-15dp">'
+                    +'     		<sm-date-picker '
+                    +'              id="{{fname}}Picker" '  
+                    +'              ng-model="value" '
+                    +'				initial-date="{{value}}"'
+                    +'              mode="{{mode}}" '
+                    +'				close-on-select="{{closeOnSelect}}"'
+                    +'              start-view="{{startView}}" '  
+                    +'              data-min-date="minDate" '
+                    +'              data-max-date="maxDate"  '
+                    +'              data-format="{{format}}"  '
+                    +'          	data-week-start-day="{{weekStartDay}}" > '
+                    +'			</sm-date-picker>'
+                    +'    	</div>'                
+                    +'  </md-input-container>',
+          link :  function(scope,$element,attr){
+    
+            var inputPane = $element[0].querySelector('.sm-input-container');
+            var calenderPane = $element[0].querySelector('.sm-calender-pane');
+            var cElement = angular.element(calenderPane);
+    
+    
+            scope.ngMassagedTempaltePath =picker.massagePath;
+            // check if Pre defined format is supplied
+            scope.format = angular.isUndefined(scope.format) ? 'MM-DD-YYYY': scope.format;
+            
+            // Hide calender pane on initialization
+            cElement.addClass('hide hide-animate');
+    
+            // set start date
+            scope.startDate  = angular.isUndefined(scope.value)? scope.startDate : scope.value;
+    
+            // Hide Calender on click out side
+            $document.on('click', function (e) {
+                if ((calenderPane !== e.target && inputPane !==e.target) && (!calenderPane.contains(e.target) && !inputPane.contains(e.target))) {
+                    hideElement();
+                }
+            });
+    
+            // if tab out hide key board
+            angular.element(inputPane).on('keydown', function (e) {
+                if(e.which===9){
+                    hideElement();
+                }
+            });
+    
+            // show calender 
+            scope.show= function(){
+              var elementRect = inputPane.getBoundingClientRect();
+              var bodyRect = document.body.getBoundingClientRect();
+    
+              cElement.removeClass('hide');
+              if($mdMedia('sm') ||  $mdMedia('xs')){
+                console.log(bodyRect.width);
+                calenderPane.style.left = (bodyRect.width-320)/2+'px';
+                calenderPane.style.top =  (bodyRect.height-450)/2+ 'px';
+              }else{
+                var rect = getVisibleViewPort(elementRect,bodyRect);
+                calenderPane.style.left = (rect.left) + 'px';
+                calenderPane.style.top = (rect.top) + 'px';
+              }
+              document.body.appendChild(calenderPane);
+              $mdUtil.disableScrollAround(calenderPane);
+              cElement.addClass('show');
+            }
+    
+            // calculate visible port to display calender
+            function getVisibleViewPort(elementRect,bodyRect){
+              var calenderHeight = 320;
+              var calenderWidth = 450;
+    
+              var top =elementRect.top;
+              if(elementRect.top +calenderHeight > bodyRect.bottom){
+                top = elementRect.top - ((elementRect.top +calenderHeight) - (bodyRect.bottom -20));
+              }
+              var left = elementRect.left;
+              if(elementRect.left +calenderWidth > bodyRect.right){
+                 left = elementRect.left - ((elementRect.left +calenderWidth) - (bodyRect.right -10));
+              }
+              return {top : top, left : left };
+            }
+    
+            function hideElement(){
+                cElement.addClass('hide-animate');
+                cElement.removeClass('show');
+                   //this is only for animation
+                //calenderPane.parentNode.removeChild(calenderPane);          
+                $mdUtil.enableScrolling();
+            }
+            //listen to emit for closing calender
+            scope.$on('calender:close',function(){
+                hideElement();
+            });
+        }
+      }
+    } 
+    
+    function smTimePickerNew($mdUtil,$mdMedia,$document,$timeout,picker){
+        return {
+          restrict : 'E',
+          replace:true,
+          scope :{
+            value: '=',
+            startDate : '@',
+            weekStartDay : '@',
+            startView:"@",                  
+            mode : '@',
+            format : '@',
+            minDate : '@',
+            maxDate : '@',
+            fname : "@",
+            lable : "@",
+            isRequired : '@',
+            disable : '=',
+            form : '=',
+            closeOnSelect:"@"
+          },
+          template: '  <md-input-container  >'
+                    +'    <label for="{{fname}}">{{lable }}</label>'
+                    +'    <input name="{{fname}}" ng-model="value" ng-readonly="true"'
+                    +'             type="text" placeholde="{{lable}}"'
+                    +'             aria-label="{{fname}}" data-ng-required="isRequired"'
+                    +'             ng-focus="show()" server-error class="sm-input-container">'
+                    +'    <div ng-messages="form.fname.$error" ng-if="form[fname].$touched">'
+                    +'    		<div ng-messages-include="{{ngMassagedTempaltePath}}"></div>'
+                    +'    </div>'
+                    +'    <div id="picker" class="sm-calender-pane md-whiteframe-15dp">'
+                    +'     		<sm-time-pickern '
+                    +'              id="{{fname}}Picker" '  
+                    +'              ng-model="value" '
+                    +'				initial-date="{{value}}"'
+                    +'              mode="{{mode}}" '
+                    +'				close-on-select="{{closeOnSelect}}"'
+                    +'              start-view="{{startView}}" '  
+                    +'              data-min-date="minDate" '
+                    +'              data-max-date="maxDate"  '
+                    +'              format="{{format}}"  '
+                    +'          	start-day="{{weekStartDay}}" > '
+                    +'			</sm-time-pickern>'
+                    +'    </div>'                
+                    +'  </md-input-container>',
+          link :  function(scope,$element,attr){
+            var inputPane = $element[0].querySelector('.sm-input-container');
+            var calenderPane = $element[0].querySelector('.sm-calender-pane');
+            var cElement = angular.element(calenderPane);
+            scope.ngMassagedTempaltePath =picker.massagePath;
+            // check if Pre defined format is supplied
+            scope.format = angular.isUndefined(scope.format) ? 'MM-DD-YYYY': scope.format;
+    
+            
+            // Hide calender pane on initialization
+            cElement.addClass('hide hide-animate');
+    
+            // set start date
+            scope.startDate  = angular.isUndefined(scope.value)? scope.startDate : scope.value;
+    
+            // Hide Calender on click out side
+            $document.on('click', function (e) {
+                if ((calenderPane !== e.target && inputPane !==e.target) && (!calenderPane.contains(e.target) && !inputPane.contains(e.target))) {
+                    hideElement();
+                }
+            });
+    
+            // if tab out hide key board
+            angular.element(inputPane).on('keydown', function (e) {
+                if(e.which===9){
+                    hideElement();
+                }
+            });
+    
+            // show calender 
+            scope.show= function(){
+              var elementRect = inputPane.getBoundingClientRect();
+              var bodyRect = document.body.getBoundingClientRect();
+    
+              cElement.removeClass('hide');
+              if($mdMedia('sm') ||  $mdMedia('xs')){
+                console.log(bodyRect.width);
+                calenderPane.style.left = (bodyRect.width-300)/2+'px';
+                calenderPane.style.top =  (bodyRect.height-450)/2+ 'px';
+              }else{
+                var rect = getVisibleViewPort(elementRect,bodyRect);
+                calenderPane.style.left = (rect.left) + 'px';
+                calenderPane.style.top = (rect.top) + 'px';
+              }
+              document.body.appendChild(calenderPane);
+              $mdUtil.disableScrollAround(calenderPane);
+              cElement.addClass('show');
+            }
+    
+            // calculate visible port to display calender
+            function getVisibleViewPort(elementRect,bodyRect){
+              var calenderHeight = 460;
+              var calenderWidth = 296;
+    
+              var top =elementRect.top;
+              if(elementRect.top +calenderHeight > bodyRect.bottom){
+                top = elementRect.top - ((elementRect.top +calenderHeight) - (bodyRect.bottom -20));
+              }
+              var left = elementRect.left;
+              if(elementRect.left +calenderWidth > bodyRect.right){
+                 left = elementRect.left - ((elementRect.left +calenderWidth) - (bodyRect.right -10));
+              }
+              return {top : top, left : left };
+            }
+    
+            function hideElement(){
+                cElement.addClass('hide-animate');
+                cElement.removeClass('show');
+                   //this is only for animation
+                //calenderPane.parentNode.removeChild(calenderPane);          
+                $mdUtil.enableScrolling();
+            }
+            //listen to emit for closing calender
+            scope.$on('calender:close',function(){
+                hideElement();
+            });
+        }
+      }
+    } 
+    */
+
+    function picker(){
+        var massagePath = "X";
+        var cancelLabel = "Cancel";
+        var okLabel = "Ok";
+        var customHeader ={
+            date:'MMM DD',
+            dateTime:'MMM DD HH:mm',
+            time:'HH:mm',
+        }
+    
+    
+        //date picker configuration
+        var daysNames =  [
+            {'single':'S','shortName':'Su','fullName':'Sunday'}, 
+            {'single':'M','shortName':'Mo','fullName':'MonDay'}, 
+            {'single':'T','shortName':'Tu','fullName':'TuesDay'}, 
+            {'single':'W','shortName':'We','fullName':'Wednesday'}, 
+            {'single':'T','shortName':'Th','fullName':'Thursday'}, 
+            {'single':'F','shortName':'Fr','fullName':'Friday'}, 
+            {'single':'S','shortName':'Sa','fullName':'Saturday'}
+        ];
+    
+        var dayHeader = "single";
+    
+        var monthNames = moment.months();
+    
+        //range picker configuration
+        var rangeDivider = "To";
+        var rangeDefaultList = ['Today',
+                'Last 7 Days',
+                'This Month',
+                'Last Month',
+                'This Quarter',
+                'Year To Date',
+                'This Year', 
+                'Custome Range'];
+    
+        var rangeCustomStartEnd =['Start Date','End Date'];            
+    
+        
+        return{
+            setMassagePath : function(param){
+                massagePath = param;
+            },
+            setDivider : function(value){
+                divider = value
+            },  
+            setDaysNames : function(array){
+                daysNames =array;
+            },
+            setMonthNames : function(array){
+                monthNames = array;
+            }, 
+            setDayHeader : function(param){
+                dayHeader = param;
+            },
+            setOkLabel : function(param){
+                okLabel = param;
+            },               
+            setCancelLabel : function(param){
+                cancelLabel = param;
+            },     
+            setRangeDefaultList : function(array){
+                rangeDefaultList = array;
+            },
+            setRangeCustomStartEnd : function(array){
+                rangeCustomStartEnd = array;
+            },           
+            setCustomHeader : function(obj){
+                if(!angular.isUndefined(obj.date)){
+                    customHeader.date= obj.date;
+                }
+                if(!angular.isUndefined(obj.dateTime)){
+                    customHeader.dateTime= obj.dateTime;
+                }
+                if(!angular.isUndefined(obj.time)){
+                    customHeader.time= obj.time;
+                }                        
+            },               
+            $get: function(){
+                return {
+                    massagePath : massagePath,
+                    cancelLabel: cancelLabel,
+                    okLabel : okLabel,
+    
+                    daysNames : daysNames,
+                    monthNames:monthNames,
+                    dayHeader :dayHeader,
+                    customHeader:customHeader,
+    
+                    rangeDivider : rangeDivider,
+                    rangeCustomStartEnd : rangeCustomStartEnd,
+                    rangeDefaultList :rangeDefaultList                 
+                }
+            }
+        }
+    }
+    
+    
+    var app = angular.module('smDateTimeRangePicker', []);
+    
+    app.directive('smCalendarComponent',['$timeout','pickerComponent',Calender]);
+    //app.directive('smDateTimePicker',['$mdUtil','$mdMedia','$document','$timeout','picker',DateTimePicker]);
+    //app.directive('smTimePickerNew',['$mdUtil','$mdMedia','$document','$timeout','picker',smTimePickerNew]);
+    
+    app.provider('pickerComponent',[picker]);
+    
+    })();
+(function(){
+
+    'use strict';
+    
+    function TimePicker(){
+        return {
+          restrict : 'E',
+          replace:true,
+          require: ['^ngModel', 'smTimeComponent'],
+          scope :{
+                  initialDate: "=ngModel",
+                  initialTime : "@",
+                  format:"@"
+            },
+            controller:["$scope","$timeout",TimePickerCtrl],
+            controllerAs : 'vm',
+            //bindToController: "true",
+            templateUrl:"picker/calendar-hour-component.html",
+            link : function(scope,element,att,ctrls){
+                console.log('TP  link');
+                console.log('TP link initialDate: ', scope.initialDate)
+                var ngModelCtrl = ctrls[0];
+                var calCtrl = ctrls[1];
+                calCtrl.configureNgModel(ngModelCtrl);
+    
+                scope.$on('$destroy',function(){
+                   element.remove();
+                });
+            }      
+        }
+    }
+    
+    var TimePickerCtrl = function($scope,$timeout){
+        var self  = this;
+        self.MIDDLE_INDEX = 4;
+
+        self.$onInit = onInit;
+
+        function onInit() {
+            self.format = $scope.format;
+            self.initialDate = $scope.initialDate;
+            self.$scope = $scope;
+            self.$timeout = $timeout;
+            //self.initialDate = $scope.initialDate; 	//if calender to be  initiated with specific date 
+            //self.format = $scope.format;
+            self.hourCells =[];
+            self.minuteCells =[];
+            self.moveCalenderAnimation='';
+            self.format = angular.isUndefined(self.format) ? 'HH:mm': self.format;
+            
+            self.initialDate =	angular.isUndefined(self.initialDate)? moment() : moment(self.initialDate, self.format);
+            console.log('TP onInit: initialDate:', self.initialDate);
+            self.currentDate = self.initialDate.clone();
+            self.init();
+            self.show=true;
+
+            $scope.$on('calendar:show', function(event, params) {
+                console.log('TP showhour...', self.initialDate, params.initialDate);
+                
+                self.initialDate =	angular.isUndefined(params.initialDate)? moment() : moment(params.initialDate, "DD.MM.YYYY HH:mm");
+                console.log('formatted initialDate:', self.initialDate);
+                self.currentDate = self.initialDate.clone();
+                self.hourCells =[];
+                self.minuteCells =[];
+                //self.currentDate = angular.isUndefined(ngModelCtrl.$viewValue) ? moment(): moment(ngModelCtrl.$viewValue, scope.format) ; //corner case: is empty String
+                self.init();
+            })
+        }
+    }
+    
+    
+     TimePickerCtrl.prototype.configureNgModel = function(ngModelCtrl) {
+        this.ngModelCtrl = ngModelCtrl;
+        var self = this;
+        ngModelCtrl.$render = function() {
+          self.ngModelCtrl.$viewValue= self.currentDate;
+        };
+      };
+    
+    
+      TimePickerCtrl.prototype.setNgModelValue = function(date) {
+          var self = this;
+        self.ngModelCtrl.$setViewValue(date);
+        self.ngModelCtrl.$render();
+      };
+    
+    TimePickerCtrl.prototype.init = function(){
+        console.log('init...')
+        var self = this;
+        self.buidHourCells();
+        self.buidMinuteCells();
+        self.headerDispalyFormat = "HH:mm";
+        self.showHour();
+    };
+    
+    TimePickerCtrl.prototype.showHour = function() {
+		var self = this;
+
+        console.log('sethour...', self.initialDate.hour(), self.initialDate.minute());
+
+		self.hourTopIndex = ((self.initialDate.hour()-self.MIDDLE_INDEX) >= 0) ? (self.initialDate.hour()-self.MIDDLE_INDEX) : 0;
+        self.minuteTopIndex = ((self.initialDate.minute()-self.MIDDLE_INDEX) >= 0) ? (self.initialDate.minute()-self.MIDDLE_INDEX) : 0;
+        
+        console.log('hour,minute top index:', self.hourTopIndex, self.minuteTopIndex);
+
+		//self.minuteTopIndex	= (self.initialDate.minute() - 0) + Math.floor(7 / 2);
+
+		//self.yearTopIndex = (self.initialDate.year() - self.yearItems.START) + Math.floor(self.yearItems.PAGE_SIZE / 2);
+		//	self.hourItems.currentIndex_ = (self.initialDate.hour() - self.hourItems.START) + 1;
+	};
+    
+    TimePickerCtrl.prototype.buidHourCells = function(){
+        
+        var self = this;
+        for (var i = 0 ; i <= 23; i++) {
+            var hour={
+                hour : i,
+                isCurrent :(self.initialDate.hour())=== i 
+            }
+            self.hourCells.push(hour);
+        };	
+    };
+    
+    TimePickerCtrl.prototype.buidMinuteCells = function(){
+        var self = this;
+        for (var i = 0 ; i <= 59; i++) {
+            var minute = {
+                minute : i,
+                isCurrent : (self.initialDate.minute())=== i,
+            }
+            self.minuteCells.push(minute);
+        };
+    };
+    
+
+    TimePickerCtrl.prototype._buildHourCells = function(){
+		var self = this;
+		self.hourTopIndex = ((self.initialDate.hour()-self.MIDDLE_INDEX) >= 0) ? (self.initialDate.hour()-self.MIDDLE_INDEX) : 0;
+		for (var i = 0 ; i <= 23; i++) {
+			var hour={
+				hour : i,
+				isCurrent :(self.initialDate.hour())=== i
+			}
+			self.hourItems.push(hour);
+		};
+	};
+
+	TimePickerCtrl.prototype._buildMinuteCells = function(){
+		var self = this;
+		self.minuteTopIndex = ((self.initialDate.minute()-self.MIDDLE_INDEX) >= 0) ? (self.initialDate.minute()-self.MIDDLE_INDEX) : 0;
+		for (var i = 0 ; i <= 59; i++) {
+			var minute = {
+				minute : i,
+				isCurrent : (self.initialDate.minute())=== i,
+			}
+			self.minuteCells.push(minute);
+		};
+    };
+    
+    
+    TimePickerCtrl.prototype.selectDate = function(d,isDisabled){
+        var self = this;
+        if (isDisabled) return;
+        self.currentDate = d;
+    
+        self.$scope.$emit('calender:date-selected');
+    }
+    
+    
+    TimePickerCtrl.prototype.setHour = function(h){
+        var self = this;
+        self.currentDate.hour(h);
+        console.log('setHour: ', self.currentDate.format(self.format))
+
+        self.setNgModelValue(self.currentDate.format(self.format));
+
+        self.$scope.$emit('calender:date-selected');
+    }
+    
+    TimePickerCtrl.prototype.setMinute = function(m){
+        var self = this;
+        self.currentDate.minute(m);
+        console.log('setMinute: ', self.currentDate.format(self.format))
+
+        self.setNgModelValue(self.currentDate.format(self.format));
+        
+        self.$scope.$emit('calender:date-selected');
+    }
+    
+    TimePickerCtrl.prototype.selectedDateTime = function(){
+        var self = this;
+        console.log('select: ', self.currentDate.format(self.format))
+        self.setNgModelValue(self.currentDate.format(self.format));
+        if(self.mode === 'time') 
+            self.view='HOUR' 
+        else 
+            self.view='DATE';
+        self.$scope.$emit('calender:close');			
+    }
+    
+    var app = angular.module('smDateTimeRangePicker');
+    
+    app.directive('smTimeComponent',['$timeout',TimePicker]);
+    
+    
+    })();
+(function(){
+
+    'use strict';
+    
+    function DatePickerDir($timeout,picker,$mdMedia,$window){
+        return {
+          restrict : 'E',
+          require: 'ngModel',
+          replace: true,
+          scope :{
+                  initialDate : "=ngModel",
+                  minDate:"=",
+                  maxDate:"=",
+                  format:"@",
+                  mode:"@",	      	
+                  startDay:"@",
+                  closeOnSelect:"@",
+                  weekStartDay:"@",
+                  isOpen:"<"
+            },
+            templateUrl:"picker/date-picker-component.html",
+            //controller: ['$scope', DatePickerDir],
+            //controllerAs: 'ctrl',
+            //bindToController: true,
+            link: function(scope, element, attrs, ngModelCtrl) {
+                console.log('DP link...');
+                //console.log('DP initialDate:', scope.initialDate);
+                //scope.currentDate = isNaN(ngModelCtrl.$viewValue)  ? moment(): ngModelCtrl.$viewValue ;
+                //scope.ngModelCtrl = ngModelCtrl;
+                setViewMode(scope.mode);
+
+                scope.okLabel = picker.okLabel;
+                scope.cancelLabel = picker.cancelLabel;			
+    
+                scope.$mdMedia =$mdMedia;
+                scope.currentDate = isNaN(ngModelCtrl.$viewValue)  ? moment(): moment(ngModelCtrl.$viewValue, scope.format);
+                scope.selectedDate = scope.currentDate;
+                
+                function setViewMode(mode){
+                    switch(mode) {
+                        case 'date':
+                            scope.view = 'DATE';
+                            scope.headerDispalyFormat = picker.customHeader.date;				        
+                            break;
+                        case 'date-time':
+                            scope.view = 'DATE'
+                            scope.headerDispalyFormat =  picker.customHeader.dateTime;			
+                            break;
+                        case 'time':
+                            scope.view = 'HOUR';
+                            scope.headerDispalyFormat = "HH:mm";
+                            break;
+                        default:
+                            scope.headerDispalyFormat = "MMM DD ";
+                            scope.view = 'DATE';
+                    }					
+                }
+    
+                // Event: show Calendar/Time component
+                scope.$on('calendar:show', function() {
+                    // get current date from model
+                    //console.log('DP initialDate:', scope.initialDate);
+                    console.log('DP $viewValue:', ngModelCtrl.$viewValue);
+
+                    //scope.selectedDate = scope.initialDate;
+                    scope.selectedDate = angular.isUndefined(ngModelCtrl.$viewValue) ? moment(): moment(ngModelCtrl.$viewValue, scope.format);
+                    scope.currentDate = angular.isUndefined(ngModelCtrl.$viewValue) ? moment(): moment(ngModelCtrl.$viewValue, scope.format) ; //corner case: is empty String
+                    console.log('DP current date:', scope.currentDate);
+                });
+
+                /** 
+                 * Event: User selects a date or hour/minute in the Calendar/Time component
+                */
+                scope.$on('calender:date-selected',function(){
+                    // update currentDate ( => Moment object)
+                    var date = moment(scope.selectedDate, scope.format);
+                    if(!date.isValid()) {
+                        date = moment();
+                        scope.selectedDate = date;
+                    }
+
+                    // selectedTime = string...
+                    if(!angular.isUndefined(scope.selectedTime)) {
+                        var timeSplit = scope.selectedTime.split(':');
+                        date.hour(timeSplit[0]).minute(timeSplit[1]);
+                    }
+
+                    scope.currentDate = date;
+                    console.log('currentDate:', scope.currentDate)
+
+                    // TODO: old code...
+                    if(scope.closeOnSelect && (scope.mode!=='date-time' || scope.mode!=='time')){
+                        var date = moment(scope.selectedDate,scope.format);
+                        if(!date.isValid()){
+                            date = moment();
+                            scope.selectedDate =date;
+                        }
+                        if(!angular.isUndefined(scope.selectedTime)){	
+                            var timeSplit = scope.selectedTime.split(':');
+                            date.hour(timeSplit[0]).minute(timeSplit[1]);
+                        }
+                        scope.currentDate =scope.selectedDate;
+                        ngModelCtrl.$setViewValue(date.format(scope.format));
+                        ngModelCtrl.$render();
+                        setViewMode(scope.mode)
+                        scope.$emit('calender:close');
+                    }
+                })
+    
+                /**
+                 * User clicks on "Save" button
+                 */
+                scope.selectedDateTime = function(){
+                    var date = moment(scope.selectedDate,scope.format);
+                    if(!date.isValid()){
+                        date = moment();
+                        scope.selectedDate =date;
+                    }
+                    if(!angular.isUndefined(scope.selectedTime)){	
+                        var timeSplit = scope.selectedTime.split(':');
+                        date.hour(timeSplit[0]).minute(timeSplit[1]);
+                    }
+                    //scope.currentDate =scope.selectedDate;
+                    scope.currentDate = date;
+                    ngModelCtrl.$setViewValue(date.format(scope.format));
+                    ngModelCtrl.$render();
+                    setViewMode(scope.mode)
+                    scope.$emit('calender:close');			
+                }
+    
+                /**
+                 * User clicks on "Cancel" button
+                 */
+                scope.closeDateTime = function(){
+                    scope.currentDate = isNaN(ngModelCtrl.$viewValue)  ? moment(): moment(ngModelCtrl.$viewValue);
+                    setViewMode(scope.mode);
+                    scope.$emit('calender:close');			
+                }
+            }
+        } 
+    }
+    
+    function TimePickerDir($timeout,picker){
+        return {
+          restrict : 'E',
+          require: '^ngModel',
+          replace:true,
+          scope :{
+                  initialDate : "@",
+                  format:"@",
+                  mode:"@",	      	
+                  startDay:"@",
+                  closeOnSelect:"@"
+            },
+            templateUrl:"picker/date-picker-component.html",
+            link : function(scope,element,att,ngModelCtrl){
+                setViewMode(scope.mode)
+                
+                scope.okLabel = picker.okLabel;
+                scope.cancelLabel = picker.cancelLabel;
+    
+                scope.currentDate = isNaN(ngModelCtrl.$viewValue)  ? moment(): ngModelCtrl.$viewValue ;
+                scope.selectedDate = scope.currentDate;
+                scope.selectedTime = scope.currentDate;
+    
+                function setViewMode(mode){
+                    switch(mode) {
+                        case 'date-time':
+                            scope.view = 'DATE'
+                            scope.headerDispalyFormat = "MMM DD HH:mm";			
+                            break;
+                        case 'time':
+                            scope.view = 'HOUR';
+                            scope.headerDispalyFormat = "HH:mm";
+                            break;
+                        default:
+                            scope.view = 'DATE';
+                    }					
+                }
+    
+                scope.$on('calender:date-selected',function(){
+                    if(scope.closeOnSelect && (scope.mode!=='date-time' || scope.mode!=='time')){
+                        var date = moment(scope.selectedDate,scope.format);
+                        if(!date.isValid()){
+                            date = moment();
+                            scope.selectedDate =date;
+                        }
+                        if(!angular.isUndefined(scope.selectedTime)){	
+                            var timeSplit = scope.selectedTime.split(':');
+                            date.hour(timeSplit[0]).minute(timeSplit[1]);
+                        }
+                        scope.currentDate =scope.selectedDate;
+                        ngModelCtrl.$setViewValue(date.format(scope.format));
+                        ngModelCtrl.$render();
+                        setViewMode(scope.mode)
+                        scope.$emit('calender:close');			
+    
+                    }
+                })
+    
+                scope.selectedDateTime = function(){
+                    var date = moment(scope.selectedDate,scope.format);
+                    if(!date.isValid()){
+                        date = moment();
+                        scope.selectedDate =date;
+                    }
+                    if(!angular.isUndefined(scope.selectedTime)){	
+                        var timeSplit = scope.selectedTime.split(':');
+                        date.hour(timeSplit[0]).minute(timeSplit[1]);
+                    }
+                    scope.currentDate =scope.selectedDate;
+                    ngModelCtrl.$setViewValue(date.format(scope.format));
+                    ngModelCtrl.$render();
+                    setViewMode(scope.mode)
+                    scope.$emit('calender:close');			
+                }
+    
+    
+                scope.closeDateTime = function(){
+                    scope.$emit('calender:close');			
+                }
+    
+            }      
+        }
+    }
+    
+    var app = angular.module('smDateTimeRangePicker');
+    
+    app.directive('smDatePickerComponent',['$timeout','pickerComponent','$mdMedia','$window',DatePickerDir]);
+    //app.directive('smTimePickerComponent',['$timeout','picker',TimePickerDir]);
+    
+    })();
 /* global moment */
 (function(){
     'use strict';
@@ -398,7 +1515,7 @@ if (typeof moment === 'undefined') {
         return false;
     };
 
-    var app = angular.module('smDateTimeRangePicker', []);
+    var app = angular.module('smDateTimeRangePicker');
     app.directive('smCalender', Calender);
 })();
 
@@ -956,6 +2073,165 @@ if (typeof moment === 'undefined') {
             return datePicker;
         }];
     });
+})();
+
+
+(function(){
+
+'use strict';
+
+function DateTimePickerComponent($mdUtil,$mdMedia,$document,$timeout,picker){
+    return {
+      restrict : 'E',
+      replace:true,
+      require: 'ngModel',
+      scope :{
+        value: '=ngModel',
+        startDate : '@',
+        weekStartDay : '@',
+        startView:"@",                  
+        mode : '@',
+        format : '@',
+        minDate : '@',
+        maxDate : '@',
+        fname : "@",
+        lable : "@",
+        isRequired : '@',
+        disable : '=',
+        form : '=',
+	    closeOnSelect:"@"
+      },
+      controller: ['$scope', '$element', DateTimePickerComponentController],
+      //bindToController:true,
+      template: '  <md-input-container>'
+                +'    <label for="{{fname}}">{{lable }}</label>'
+                +'    <input name="{{fname}}" ng-model="value" ng-readonly="true"'
+                +'             type="text" placeholde="{{lable}}"'
+                +'             aria-label="{{fname}}" data-ng-required="isRequired" ng-disabled="disable"'
+                +'             ng-focus="show()" server-error class="sm-input-container">'
+                +'    <!--div ng-messages="form[fname].$error" ng-if="form[fname].$touched">'
+                +'    		<div ng-messages-include="{{ngMassagedTempaltePath}}"></div>'
+                +'    </div-->'
+                +'    	<div id="picker" class="sm-calender-pane md-whiteframe-15dp">'
+                +'     		<sm-date-picker-component '
+                +'              is-open="isOpen" '
+                +'              id="{{fname}}Picker" '  
+                +'              ng-model="value" '
+//                +'				initial-date="{{value}}"'
+                +'              mode="{{mode}}" '
+                +'				close-on-select="{{closeOnSelect}}"'
+                +'              start-view="{{startView}}" '  
+                +'              data-min-date="minDate" '
+                +'              data-max-date="maxDate"  '
+                +'              data-format="{{format}}"  '
+                +'          	data-week-start-day="{{weekStartDay}}" > '
+                +'			</sm-date-picker-component>'
+                +'    	</div>'                
+                +'  </md-input-container>'
+    }
+
+    function DateTimePickerComponentController(scope, $element) {
+        var ctrl = this;
+
+        ctrl.$onInit = onInit;
+
+        console.log('controller value:', scope.value);
+
+        function onInit() {
+            var inputPane = $element[0].querySelector('.sm-input-container');
+            var calenderPane = $element[0].querySelector('.sm-calender-pane');
+            var cElement = angular.element(calenderPane);
+
+            console.log('controller onInit value:', scope.value);
+
+            scope.ngMassagedTempaltePath = picker.massagePath;
+            // check if Pre defined format is supplied
+            scope.format = angular.isUndefined(scope.format) ? 'MM-DD-YYYY': scope.format;
+            
+            // Hide calender pane on initialization
+            cElement.addClass('hide hide-animate');
+
+            // set start date
+            scope.startDate  = angular.isUndefined(scope.value)? scope.startDate : scope.value;
+
+            // Hide Calender on click out side
+            $document.on('click', function (e) {
+                if ((calenderPane !== e.target && inputPane !==e.target) && (!calenderPane.contains(e.target) && !inputPane.contains(e.target))) {
+                    hideElement();
+                }
+            });
+
+            // if tab out hide key board
+            angular.element(inputPane).on('keydown', function (e) {
+                if(e.which===9){
+                    hideElement();
+                }
+            });
+
+            scope.isOpen = false;
+
+            // show calender 
+            scope.show = function(){
+                console.log('DTPicker value:', scope.value);
+
+                var elementRect = inputPane.getBoundingClientRect();
+                var bodyRect = document.body.getBoundingClientRect();
+        
+                cElement.removeClass('hide');
+                if($mdMedia('sm') ||  $mdMedia('xs')){
+                    console.log(bodyRect.width);
+                    calenderPane.style.left = (bodyRect.width-320)/2+'px';
+                    calenderPane.style.top =  (bodyRect.height-450)/2+ 'px';
+                }else{
+                    var rect = getVisibleViewPort(elementRect,bodyRect);
+                    calenderPane.style.left = (rect.left) + 'px';
+                    calenderPane.style.top = (rect.top) + 'px';
+                }
+                document.body.appendChild(calenderPane);
+                $mdUtil.disableScrollAround(calenderPane);
+                cElement.addClass('show');
+                // send message
+                scope.$broadcast('calendar:show', {initialDate: scope.value});
+                scope.isOpen = true;
+            }
+
+            function hideElement(){
+                cElement.addClass('hide-animate');
+                cElement.removeClass('show');
+                    //this is only for animation
+                //calenderPane.parentNode.removeChild(calenderPane);          
+                $mdUtil.enableScrolling();
+            }
+
+            //listen to emit for closing calender
+            scope.$on('calender:close',function(){
+                hideElement();
+                scope.isOpen = false;
+            });
+        }
+    
+        // calculate visible port to display calender
+        function getVisibleViewPort(elementRect,bodyRect){
+            var calenderHeight = 320;
+            var calenderWidth = 450;
+    
+            var top =elementRect.top;
+            if(elementRect.top +calenderHeight > bodyRect.bottom){
+                top = elementRect.top - ((elementRect.top +calenderHeight) - (bodyRect.bottom -20));
+            }
+            var left = elementRect.left;
+            if(elementRect.left +calenderWidth > bodyRect.right){
+                left = elementRect.left - ((elementRect.left +calenderWidth) - (bodyRect.right -10));
+            }
+            return {top : top, left : left };
+        }
+    }
+}
+
+var app = angular.module('smDateTimeRangePicker');
+
+app.directive('smDateTimePickerComponent',['$mdUtil','$mdMedia','$document','$timeout','pickerComponent',DateTimePickerComponent]);
+
 })();
 
 /* global moment */
@@ -2094,9 +3370,12 @@ app.directive('smTimePickerNew', ['$mdUtil', '$mdMedia', '$document', '$timeout'
 
 }());
 
-angular.module("smDateTimeRangePicker").run(["$templateCache", function($templateCache) {$templateCache.put("picker/calender-date.html","<div class=\"date-picker\">\n    <div ng-class=\"{\'year-container\' : vm.view===\'YEAR_MONTH\'}\" ng-show=\"vm.view===\'YEAR_MONTH\'\" layout=\"column\">\n        <a href=\"javascript:void(0)\" class=\"cal-link\" ng-click=\"vm.view = \'DATE\'\">Back to calendar</a>\n        <md-virtual-repeat-container class=\"year-md-repeat\" id=\"year-container\" md-top-index=\"vm.yearTopIndex\">\n            <div class=\"repeated-item\" md-on-demand=\"\" md-virtual-repeat=\"yr in vm.yearItems\">\n                    <div class=\"year\" ng-class=\"{\'md-accent\': yr === vm.currentDate.year(), \'selected-year md-primary \':vm.initialDate.year()===yr}\">\n                         <span class=\"year-num\" ng-click=\"vm.changeYear(yr,vm.currentDate.month())\">{{yr}}</span> \n                         <div class=\"month-list\">\n                            <div class=\"month-row\" >\n                                <span ng-click=\"vm.changeYear(yr,0)\" class=\"month\">{{vm.monthList[0]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,1)\" class=\"month\">{{vm.monthList[1]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,2)\" class=\"month\">{{vm.monthList[2]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,3)\" class=\"month\">{{vm.monthList[3]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,4)\" class=\"month\">{{vm.monthList[4]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,5)\" class=\"month\">{{vm.monthList[5]}}</span>\n                            </div>\n                                <div  class=\"month-row\">\n                                <span ng-click=\"vm.changeYear(yr,6)\" class=\"month\">{{vm.monthList[6]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,7)\" class=\"month\">{{vm.monthList[7]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,8)\" class=\"month\">{{vm.monthList[8]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,9)\" class=\"month\">{{vm.monthList[9]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,10)\" class=\"month\">{{vm.monthList[10]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,11)\" class=\"month\">{{vm.monthList[11]}}</span>\n                            </div>\n                         </div>                  \n                    </div>\n                    <md-divider></md-divider>\n            </div>\n        </md-virtual-repeat-container>\n    </div>\n    <div ng-class=\"{\'date-container\' : vm.view===\'DATE\'}\" ng-show=\"vm.view===\'DATE\'\">\n        <div class=\"navigation\" layout=\"row\" layout-align=\"space-between center\">\n            <md-button aria-label=\"previous\" class=\"md-icon-button scroll-button\" ng-click=\"vm.changePeriod(\'p\')\" ng-disabled=\"vm.stopScrollPrevious\">\n                <svg height=\"18\" viewbox=\"0 0 18 18\" width=\"18\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <path d=\"M15 8.25H5.87l4.19-4.19L9 3 3 9l6 6 1.06-1.06-4.19-4.19H15v-1.5z\">\n                    </path>\n                </svg>\n            </md-button>\n            <md-button aria-label=\"Change Year\" class=\"md-button\" md-no-ink=\"\" ng-class=\"vm.moveCalenderAnimation\" ng-click=\"vm.changeView(\'YEAR_MONTH\')\">\n                {{vm.monthList[vm.initialDate.month()]}}{{\' \'}}{{vm.initialDate.year()}}\n            </md-button>\n            <md-button aria-label=\"next\" class=\"md-icon-button scroll-button\" ng-click=\"vm.changePeriod(\'n\')\" ng-disabled=\"vm.stopScrollNext\">\n                <svg height=\"18\" viewbox=\"0 0 18 18\" width=\"18\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <path d=\"M9 3L7.94 4.06l4.19 4.19H3v1.5h9.13l-4.19 4.19L9 15l6-6z\">\n                    </path>\n                </svg>\n            </md-button>\n        </div>\n        <div class=\"date-cell-header\">\n            <md-button class=\"md-icon-button\" ng-disabled=\"true\" ng-repeat=\"dHead in vm.dateCellHeader\">\n                {{dHead[vm.dayHeader]}}\n            </md-button>\n        </div>\n        <div class=\"date-cell-row\" md-swipe-left=\"vm.changePeriod(\'n\')\" md-swipe-right=\"vm.changePeriod(\'p\')\" ng-class=\"vm.moveCalenderAnimation\">\n            <div layout=\"row\" ng-repeat=\"w in vm.dateCells\">\n                <md-button aria-label=\"vm.currentDate\" class=\"date-cell md-icon-button\" ng-class=\"{\'{{vm.colorIntention}} sm-today\' : d.today,\n								\'active\':d.isCurrentMonth,\n								\'{{vm.colorIntention}} md-raised selected\' :d.date.isSame(vm.currentDate, \'day\') && d.date.isSame(vm.currentDate, \'month\') && d.date.isSame(vm.currentDate, \'year\'),\n								\'disabled\':d.isDisabledDate}\" ng-click=\"vm.selectDate(d.date,d.isDisabledDate)\" ng-disabled=\"d.isDisabledDate\" ng-repeat=\"d in w\">\n                    <span>\n                        {{d.dayNum}}\n                    </span>\n                </md-button>\n            </div>\n        </div>\n    </div>\n</div>\n");
+angular.module("smDateTimeRangePicker").run(["$templateCache", function($templateCache) {$templateCache.put("picker/calendar-date-component.html","<div  class=\"date-picker\">\n        <div ng-show=\"vm.view===\'YEAR_MONTH\'\" ng-class=\"{\'year-container\' : vm.view===\'YEAR_MONTH\'}\"> \n            <md-virtual-repeat-container id=\"year-container\" class=\"year-md-repeat\" md-top-index=\"vm.yearTopIndex\">\n                  <div md-virtual-repeat=\"yr in vm.yearItems\"  md-on-demand  class=\"repeated-item\" flex>\n                    <md-button class=\"md-button\" \n                        aria-label=\"year\"\n                        ng-click=\"vm.changeYear(yr)\" 							\n                        ng-class=\"{\'md-primary\': yr === vm.currentDate.year(),\n                                    \'md-primary md-raised\' :yr ===vvm.currentDate.year(),\n                                    \'selected-year md-primary\':vm.initialDate.year()===yr}\">\n                        {{yr}}\n                    </md-button>				          \n                  </div>\n            </md-virtual-repeat-container>		     \n        </div>				\n        <div ng-show=\"vm.view===\'DATE\'\" ng-class=\"{\'date-container\' : vm.view===\'DATE\'}\">\n            <div layout=\"row\" class=\"navigation\" layout-align=\"space-between center\">\n                    <md-button \n                        ng-disabled=\"vm.stopScrollPrevious\" \n                        class=\"md-icon-button scroll-button\" \n                        aria-label=\"privious\" \n                        ng-click=\"vm.changePeriod(\'p\')\">\n                            <md-icon md-font-icon=\"material-icons\">keyboard_arrow_left</md-icon>					\n                    </md-button>\n                    <md-button class=\"md-button\" ng-class=\"vm.moveCalenderAnimation\" ng-click=\"vm.changeView(\'YEAR_MONTH\')\">\n                        {{vm.monthList[vm.initialDate.month()]}}{{\' \'}}{{vm.initialDate.year()}}\n                    </md-button>			\n                    <md-button  \n                        ng-disabled=\"vm.stopScrollNext\" \n                        class=\"md-icon-button scroll-button\" \n                        aria-label=\"next\" \n                        ng-click=\"vm.changePeriod(\'n\')\">\n                        <md-icon md-font-icon=\"material-icons\">keyboard_arrow_right</md-icon>	\n                    </md-button>				\n            </div>			\n            <div layout=\"row\" class=\"date-cell-header\">\n                <md-button class=\"md-icon-button\" ng-disabled=\"true\" ng-repeat=\"dHead in vm.dateCellHeader\">\n                    {{dHead[vm.dayHeader]}}\n                </md-button>\n            </div>		\n            <div \n                md-swipe-right=\"vm.changePeriod(\'p\')\" \n                class=\"date-cell-row\" \n                md-swipe-left=\"vm.changePeriod(\'n\')\" \n                ng-class=\"vm.moveCalenderAnimation\">\n                <div layout=\"row\" ng-repeat=\"w in vm.dateCells\" >\n                    <md-button\n                        ng-repeat=\"d in w\"\n                        aria-label=\"vm.currentDate\"\n                        class=\"md-icon-button\"\n                        ng-click=\"vm.selectDate(d.date,d.isDisabledDate)\"\n                        ng-disabled=\"d.isDisabledDate\"\n                        ng-class=\"{\'md-primary\' : d.today,\n                            \'active\':d.isCurrentMonth,\n                            \'md-primary md-raised selected\' :d.date.isSame(vm.currentDate),\n                            \'disabled\':d.isDisabledDate}\">\n                        <span>{{d.dayNum}}</span>\n                    </md-button>\n                </div>\n            </div>\n        </div>\n</div>\n");
+$templateCache.put("picker/calendar-hour-component.html","<div  class=\"time-picker\" layout=\"row\" layout-align=\"center center\">\n        <div>\n            <div layout=\"row\" class=\"navigation\">\n                <span class=\"md-button\">Hour</span>\n                <span class=\"md-button\">Minute</span>\n            </div>\n            <div layout=\"row\" >\n                {{vm.hourTopIndex}}\n                <md-virtual-repeat-container flex=\"50\"  id=\"hour-container\" class=\"time-md-repeat\" md-top-index=\"vm.hourTopIndex\">\n                    <div md-virtual-repeat=\"h in vm.hourCells\"  class=\"repeated-item\">\n                            <md-button class=\"md-icon-button\" \n                                ng-click=\"vm.setHour(h.hour)\" 							\n                                ng-class=\"{\'md-primary\': h.isCurrent,\n                                        \'md-primary md-raised\' :h.hour===vm.currentDate.hour()}\">\n                                {{h.hour}}\n                            </md-button>\n                    </div>\n                </md-virtual-repeat-container>	\n                {{vm.minuteTopIndex}}     \n                <md-virtual-repeat-container flex=\"50\" id=\"minute-container\" class=\"time-md-repeat\" md-top-index=\"vm.minuteTopIndex\">\n                    <div md-virtual-repeat=\"m in vm.minuteCells\"  class=\"repeated-item\">\n                            <md-button class=\"md-icon-button\" \n                                ng-click=\"vm.setMinute(m.minute)\" 							\n                                ng-class=\"{\'md-primary\': m.isCurrent,\n                                    \'md-primary md-raised\' :m.minute===vm.currentDate.minute()}\">\n                                {{m.minute}}{{m.isCurrent}}\n                            </md-button>\n                    </div>\n                </md-virtual-repeat-container>		     \n            </div>	\n        </div>\n    </div>");
+$templateCache.put("picker/calender-date.html","<div class=\"date-picker\">\n    <div ng-class=\"{\'year-container\' : vm.view===\'YEAR_MONTH\'}\" ng-show=\"vm.view===\'YEAR_MONTH\'\" layout=\"column\">\n        <a href=\"javascript:void(0)\" class=\"cal-link\" ng-click=\"vm.view = \'DATE\'\">Back to calendar</a>\n        <md-virtual-repeat-container class=\"year-md-repeat\" id=\"year-container\" md-top-index=\"vm.yearTopIndex\">\n            <div class=\"repeated-item\" md-on-demand=\"\" md-virtual-repeat=\"yr in vm.yearItems\">\n                    <div class=\"year\" ng-class=\"{\'md-accent\': yr === vm.currentDate.year(), \'selected-year md-primary \':vm.initialDate.year()===yr}\">\n                         <span class=\"year-num\" ng-click=\"vm.changeYear(yr,vm.currentDate.month())\">{{yr}}</span> \n                         <div class=\"month-list\">\n                            <div class=\"month-row\" >\n                                <span ng-click=\"vm.changeYear(yr,0)\" class=\"month\">{{vm.monthList[0]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,1)\" class=\"month\">{{vm.monthList[1]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,2)\" class=\"month\">{{vm.monthList[2]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,3)\" class=\"month\">{{vm.monthList[3]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,4)\" class=\"month\">{{vm.monthList[4]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,5)\" class=\"month\">{{vm.monthList[5]}}</span>\n                            </div>\n                                <div  class=\"month-row\">\n                                <span ng-click=\"vm.changeYear(yr,6)\" class=\"month\">{{vm.monthList[6]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,7)\" class=\"month\">{{vm.monthList[7]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,8)\" class=\"month\">{{vm.monthList[8]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,9)\" class=\"month\">{{vm.monthList[9]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,10)\" class=\"month\">{{vm.monthList[10]}}</span>\n                                <span ng-click=\"vm.changeYear(yr,11)\" class=\"month\">{{vm.monthList[11]}}</span>\n                            </div>\n                         </div>                  \n                    </div>\n                    <md-divider></md-divider>\n            </div>\n        </md-virtual-repeat-container>\n    </div>\n    <div ng-class=\"{\'date-container\' : vm.view===\'DATE\'}\" ng-show=\"vm.view===\'DATE\'\">\n        <div class=\"navigation\" layout=\"row\" layout-align=\"space-between center\">\n            <md-button aria-label=\"previous\" class=\"md-icon-button scroll-button\" ng-click=\"vm.changePeriod(\'p\')\" ng-disabled=\"vm.stopScrollPrevious\">\n                <svg height=\"18\" viewbox=\"0 0 18 18\" width=\"18\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <path d=\"M15 8.25H5.87l4.19-4.19L9 3 3 9l6 6 1.06-1.06-4.19-4.19H15v-1.5z\">\n                    </path>\n                </svg>\n            </md-button>\n            <md-button aria-label=\"Change Year\" class=\"md-button\" md-no-ink=\"\" ng-class=\"vm.moveCalenderAnimation\" ng-click=\"vm.changeView(\'YEAR_MONTH\')\">\n                {{vm.monthList[vm.initialDate.month()]}}{{\' \'}}{{vm.initialDate.year()}}\n            </md-button>\n            <md-button aria-label=\"next\" class=\"md-icon-button scroll-button\" ng-click=\"vm.changePeriod(\'n\')\" ng-disabled=\"vm.stopScrollNext\">\n                <svg height=\"18\" viewbox=\"0 0 18 18\" width=\"18\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <path d=\"M9 3L7.94 4.06l4.19 4.19H3v1.5h9.13l-4.19 4.19L9 15l6-6z\">\n                    </path>\n                </svg>\n            </md-button>\n        </div>\n        <div class=\"date-cell-header\">\n            <md-button class=\"md-icon-button\" ng-disabled=\"true\" ng-repeat=\"dHead in vm.dateCellHeader\">\n                {{dHead[vm.dayHeader]}}\n            </md-button>\n        </div>\n        <div class=\"date-cell-row\" md-swipe-left=\"vm.changePeriod(\'n\')\" md-swipe-right=\"vm.changePeriod(\'p\')\" ng-class=\"vm.moveCalenderAnimation\">\n            <div layout=\"row\" ng-repeat=\"w in vm.dateCells\">\n                <md-button aria-label=\"vm.currentDate\" class=\"date-cell md-icon-button\" ng-class=\"{\'{{vm.colorIntention}} sm-today\' : d.today,\n								\'active\':d.isCurrentMonth,\n								\'{{vm.colorIntention}} md-raised selected\' :d.date.isSame(vm.currentDate, \'day\') && d.date.isSame(vm.currentDate, \'month\') && d.date.isSame(vm.currentDate, \'year\'),\n								\'disabled\':d.isDisabledDate}\" ng-click=\"vm.selectDate(d.date,d.isDisabledDate)\" ng-disabled=\"d.isDisabledDate\" ng-repeat=\"d in w\">\n                    <span>\n                        {{d.dayNum}}\n                    </span>\n                </md-button>\n            </div>\n        </div>\n    </div>\n</div>\n");
 $templateCache.put("picker/calender-hour.html","<div  class=\"time-picker\" layout=\"row\" layout-align=\"center center\">\n	<div>\n		<div layout=\"row\" class=\"navigation\">\n			<span class=\"md-button\">Hour</span>\n			<span class=\"md-button\">Minute</span>\n		</div>\n		<!--div style=\"background-color: rgba(120,120,120,0.5); position: relative; top: 132px;\" class=\"navigation\"></div-->\n		<div layout=\"row\" >\n			<md-virtual-repeat-container flex=\"50\"  id=\"hour-container{{vm.uid}}\" class=\"time-md-repeat\" md-top-index=\"vm.hourTopIndex\">\n			<div md-virtual-repeat=\"h in vm.hourItems\" class=\"repeated-item\">\n						<md-button class=\"md-icon-button\" \n							ng-click=\"vm.setHour(h.hour)\" 							\n							ng-class=\"{\'{{vm.colorIntention}}\': h.isCurrent,\n									\'{{vm.colorIntention}} md-raised\' :h.hour===vm.currentDate.hour()}\">\n							{{h.hour}}\n						</md-button>\n			</div>\n			</md-virtual-repeat-container>	\n			<md-virtual-repeat-container flex=\"50\" id=\"minute-container{{vm.uid}}\" class=\"time-md-repeat\" md-top-index=\"vm.minuteTopIndex\">\n				<div md-virtual-repeat=\"m in vm.minuteCells\"  class=\"repeated-item\">\n						<md-button class=\"md-icon-button\" \n							ng-click=\"vm.setMinute(m.minute)\" 							\n							ng-class=\"{\'{{vm.colorIntention}}\': m.isCurrent,\n								\'{{vm.colorIntention}} md-raised\' :m.minute===vm.currentDate.minute()}\">\n							{{m.minute}}\n						</md-button>\n				</div>\n			</md-virtual-repeat-container>		     \n		</div>	\n	</div>\n</div>");
-$templateCache.put("picker/date-picker-service.html","<md-dialog class=\"picker-container  md-whiteframe-15dp\" aria-label=\"picker\">\n	<md-content  layout-xs=\"column\" layout=\"row\"  class=\"container\" >\n		<md-toolbar class=\"md-height\" ng-class=\"{\'portrait\': !vm.$mdMedia(\'gt-xs\'),\'landscape\': vm.$mdMedia(\'gt-xs\')}\" >			\n				<span class=\"year-header\" layout=\"row\" layout-xs=\"row\">{{vm.viewDate.format(\'YYYY\')}}</span>\n				<span class=\"date-time-header\" layout=\"row\" layout-xs=\"row\">{{vm.viewDate.format(vm.headerDispalyFormat)}}</span>\n		</md-toolbar>\n		<div layout=\"column\" class=\"picker-container\" >\n			<div ng-show=\"vm.view===\'DATE\'\" >\n				<sm-calender \n					ng-model=\"vm.selectedDate\"\n					initial-date=\"vm.initialDate\"\n					id=\"{{vm.fname}}Picker\" \n					data-mode=\"{{vm.mode}}\" \n					data-min-date=\"vm.minDate\" \n					data-max-date=\"vm.maxDate\" \n					close-on-select=\"{{vm.closeOnSelect}}\"				 \n					data-format=\"{{vm.format}}\"  \n					data-week-start-day=\"{{vm.weekStartDay}}\"\n					date-select-call=\"vm.dateSelected(date)\">\n				</sm-calender>\n			</div>\n			<div ng-show=\"vm.view===\'HOUR\'\">\n				<sm-time\n					ng-model=\"vm.selectedTime\"\n					data-format=\"HH:mm\"\n					time-select-call=\"vm.timeSelected(time)\">\n				</sm-time>\n			</div>		\n 			<div layout=\"row\" ng-hide=\"vm.closeOnSelect && (vm.mode!==\'date-time\' || vm.mode!==\'time\')\">\n<!-- 					<div ng-show=\"vm.mode===\'date-time\'\">\n						<md-button class=\"md-icon-button\" ng-show=\"vm.view===\'DATE\'\" ng-click=\"vm.view=\'HOUR\'\">\n							<md-icon md-font-icon=\"material-icons md-primary\">access_time</md-icon>\n						</md-button>				\n						<md-button class=\"md-icon-button\" ng-show=\"vm.view===\'HOUR\'\" ng-click=\"vm.view=\'DATE\'\">\n							<md-icon md-font-icon=\"material-icons md-primary\">date_range</md-icon>\n						</md-button>\n					</div>												\n -->					<span flex></span>\n					<md-button class=\"md-button md-primary\" ng-click=\"vm.closeDateTime()\">{{vm.cancelLabel}}</md-button>\n					<md-button class=\"md-button md-primary\" ng-click=\"vm.selectedDateTime()\">{{vm.okLabel}}</md-button>\n			</div>\n		</div>\n	</md-content>	\n</md-dialog>");
+$templateCache.put("picker/date-picker-component.html","<div class=\"picker-container  md-whiteframe-15dp\">\n	<md-content  layout-xs=\"column\" layout=\"row\"  class=\"container\" >\n	<!--  -->\n		<md-toolbar class=\"md-height\" ng-class=\"{\'portrait\': !$mdMedia(\'gt-xs\'),\'landscape\': $mdMedia(\'gt-xs\')}\" >			\n				<span class=\"year-header\" layout=\"row\" layout-xs=\"row\">{{currentDate.format(\'YYYY\')}}</span>\n				<span class=\"date-time-header\" layout=\"row\" layout-xs=\"row\">{{currentDate.format(headerDispalyFormat)}}</span>\n		</md-toolbar>\n		<div layout=\"column\" class=\"picker-container\" >\n			<div ng-show=\"view===\'DATE\'\" >\n                <sm-calendar-component \n					ng-model=\"selectedDate\"\n					id=\"{{fname}}Picker\" \n					data-mode=\"{{mode}}\" \n					data-min-date=\"minDate\" \n					data-max-date=\"maxDate\" \n					close-on-select=\"{{closeOnSelect}}\"				 \n					data-format=\"{{format}}\"  \n					data-week-start-day=\"{{weekStartDay}}\">\n				</sm-calendar-component>\n			</div>\n			<div ng-show=\"view===\'HOUR\'\">\n                <sm-time-component\n                    ng-model=\"selectedTime\"\n					data-format=\"HH:mm\">\n				</sm-time-component>\n			</div>		\n			<div layout=\"row\" ng-hide=\"closeOnSelect && (mode!==\'date-time\' || mode!==\'time\')\">\n					<div ng-show=\"mode===\'date-time\'\">\n						<md-button class=\"md-icon-button\" ng-show=\"view===\'DATE\'\" ng-click=\"view=\'HOUR\'\">\n							<md-icon md-font-icon=\"material-icons md-primary\">access_time</md-icon>\n						</md-button>				\n						<md-button class=\"md-icon-button\" ng-show=\"view===\'HOUR\'\" ng-click=\"view=\'DATE\'\">\n							<md-icon md-font-icon=\"material-icons md-primary\">date_range</md-icon>\n						</md-button>\n					</div>												\n					<span flex></span>\n					<md-button class=\"md-button md-primary\" ng-click=\"closeDateTime()\">{{cancelLabel}}</md-button>\n					<md-button class=\"md-button md-primary\" ng-click=\"selectedDateTime()\">{{okLabel}}</md-button>\n			</div>\n		</div>\n	</md-content>	\n</div>");
+$templateCache.put("picker/date-picker-service.html","<md-dialog class=\"picker-container  md-whiteframe-15dp\" aria-label=\"picker\">\n	<md-content  layout-xs=\"column\" layout=\"row\"  class=\"container\" >\n		<md-toolbar class=\"md-height\" ng-class=\"{\'portrait\': !vm.$mdMedia(\'gt-xs\'),\'landscape\': vm.$mdMedia(\'gt-xs\')}\" >			\n				<span class=\"year-header\" layout=\"row\" layout-xs=\"row\">{{vm.viewDate.format(\'YYYY\')}}</span>\n				<span class=\"date-time-header\" layout=\"row\" layout-xs=\"row\">{{vm.viewDate.format(vm.headerDispalyFormat)}}</span>\n		</md-toolbar>\n		<div layout=\"column\" class=\"picker-container\" >\n			<div ng-show=\"vm.view===\'DATE\'\" >\n				<sm-calender \n					initial-date=\"vm.initialDate\"\n					id=\"{{vm.fname}}Picker\" \n					data-mode=\"{{vm.mode}}\" \n					data-min-date=\"vm.minDate\" \n					data-max-date=\"vm.maxDate\" \n					close-on-select=\"{{vm.closeOnSelect}}\"				 \n					data-format=\"{{vm.format}}\"  \n					data-week-start-day=\"{{vm.weekStartDay}}\"\n					date-select-call=\"vm.dateSelected(date)\">\n				</sm-calender>\n			</div>\n			<div ng-show=\"vm.view===\'HOUR\'\">\n				<sm-time\n					ng-model=\"vm.selectedTime\"\n					data-format=\"HH:mm\"\n					time-select-call=\"vm.timeSelected(time)\">\n				</sm-time>\n			</div>		\n 			<div layout=\"row\" ng-hide=\"vm.closeOnSelect && (vm.mode!==\'date-time\' || vm.mode!==\'time\')\">\n<!-- 					<div ng-show=\"vm.mode===\'date-time\'\">\n						<md-button class=\"md-icon-button\" ng-show=\"vm.view===\'DATE\'\" ng-click=\"vm.view=\'HOUR\'\">\n							<md-icon md-font-icon=\"material-icons md-primary\">access_time</md-icon>\n						</md-button>				\n						<md-button class=\"md-icon-button\" ng-show=\"vm.view===\'HOUR\'\" ng-click=\"vm.view=\'DATE\'\">\n							<md-icon md-font-icon=\"material-icons md-primary\">date_range</md-icon>\n						</md-button>\n					</div>												\n -->					<span flex></span>\n					<md-button class=\"md-button md-primary\" ng-click=\"vm.closeDateTime()\">{{vm.cancelLabel}}</md-button>\n					<md-button class=\"md-button md-primary\" ng-click=\"vm.selectedDateTime()\">{{vm.okLabel}}</md-button>\n			</div>\n		</div>\n	</md-content>	\n</md-dialog>");
 $templateCache.put("picker/date-picker.html","<div class=\"picker-container\">\n	<md-content  layout-xs=\"column\" layout=\"row\"  class=\"container\" >\n		<md-toolbar class=\"md-height {{vm.colorIntention}}\" ng-class=\"{\'portrait\': !vm.$mdMedia(\'gt-xs\'),\'landscape\': vm.$mdMedia(\'gt-xs\')} \" >			\n				<span class=\"year-header\" layout=\"row\" layout-xs=\"row\">{{vm.currentDate.format(\'YYYY\')}}</span>\n				<span class=\"date-time-header\" layout=\"row\" layout-xs=\"row\">{{vm.currentDate.format(vm.headerDispalyFormat)}}</span>\n		</md-toolbar>\n		<div layout=\"column\" class=\"picker-container\" >\n			<div ng-show=\"vm.view===\'DATE\'\" >\n				<sm-calender \n					data-initial-date=\"vm.initialDate\"					\n					data-id=\"{{vm.fname}}Picker\" \n					data-mode=\"{{vm.mode}}\" \n					data-min-date=\"vm.minDate\" \n					data-max-date=\"vm.maxDate\" \n					data-close-on-select=\"{{vm.closeOnSelect}}\"				 \n					data-format=\"{{vm.format}}\" \n					data-disable-year-selection=\"{{vm.disableYearSelection}}\" \n					data-week-start-day=\"{{vm.weekStartDay}}\"\n					data-date-select-call=\"vm.dateSelected(date)\">\n				</sm-calender>\n			</div>\n			<div ng-show=\"vm.view===\'TIME\'\">\n				<sm-time\n					data-ng-model=\"vm.selectedTime\"\n					data-format=\"HH:mm\"\n					data-time-select-call=\"vm.timeSelected(time)\">\n				</sm-time>\n			</div>		\n			<div layout=\"row\" ng-hide=\"vm.closeOnSelect\">\n					<span flex></span>\n					<md-button class=\"md-button buttonSelect {{vm.colorIntention}}\" ng-click=\"vm.closeDateTime()\">{{vm.cancelLabel}}</md-button>\n					<md-button class=\"md-button buttonCancel {{vm.colorIntention}}\" ng-click=\"vm.selectedDateTime()\">{{vm.okLabel}}</md-button>\n			</div>\n		</div>\n	</md-content>	\n</div>");
 $templateCache.put("picker/range-picker-input.html","<md-input-container md-no-float=\"vm.noFloatingLabel\">\n\n    <input name=\"{{vm.fname}}\" ng-model=\"vm.valueAsText\" ng-readonly=\"true\"\n        type=\"text\"\n        aria-label=\"{{vm.fname}}\" ng-required=\"{{vm.isRequired}}\" class=\"sm-input-container\"\n        ng-focus=\"vm.show()\" placeholder=\"{{vm.label}}\"\n    />\n    <div id=\"picker\" class=\"sm-calender-pane md-whiteframe-4dp\" ng-model=\"value\">\n        <sm-range-picker\n            ng-model=\"vm.value\"\n            custom-to-home=\"{{vm.customToHome}}\"\n            custom-list=\"vm.customList\"\n            mode=\"{{vm.mode}}\"\n            min-date=\"{{vm.minDate}}\"\n            max-date=\"{{vm.maxDate}}\"\n            range-select-call=\"vm.rangeSelected(range)\"\n            close-on-select=\"{{vm.closeOnSelect}}\"\n            show-custom=\"{{vm.showCustom}}\"\n            week-start-day=\"{{vm.weekStartDay}}\"\n            divider=\"{{vm.divider}}\"\n            format=\"{{vm.format}}\"\n            allow-clear=\"{{vm.allowClear}}\"\n            allow-empty=\"{{vm.allowEmpty}}\"\n        ></sm-range-picker>\n    </div>\n</md-input-container>\n");
 $templateCache.put("picker/range-picker.html","<md-content layout=\"column\"  id=\"{{id}}\" class=\"range-picker md-whiteframe-2dp\" >\n    <md-toolbar layout=\"row\"  class=\"md-primary\" >\n      	<div class=\"md-toolbar-tools\"  layout-align=\"space-around center\">\n			<div  class=\"date-display\"><span>{{vm.startDate.format(vm.format)}}</span></div>\n			<div   class=\"date-display\"><span>{{vm.endDate.format(vm.format)}}</span></div>\n		</div>\n	</md-toolbar>\n	<div  layout=\"column\" class=\"pre-select\"  role=\"button\" ng-show=\"!vm.showCustom\">\n		<md-button\n			 aria-label=\"{{list.label}}\"\n			 ng-click=\"vm.setNgModelValue(list.startDate,vm.divider,list.endDate)\"\n			 ng-repeat=\"list in vm.rangeDefaultList | limitTo:6\">{{list.label}}\n		 </md-button>\n		<md-button aria-label=\"Custom Range\"  ng-click=\"vm.showCustomView()\">{{vm.customRangeLabel}}</md-button>\n	</div>\n	<div layout=\"column\" class=\"custom-select\" ng-if=\"vm.showCustom\" ng-class=\"{\'show-calender\': vm.showCustom}\">\n		<div layout=\"row\"   class=\"tab-head\">\n			<!--<span  ng-class=\"{\'active moveLeft\':vm.selectedTabIndex===0}\">{{vm.rangeCustomStartEnd[0]}}</span>-->\n			<a class=\"start-btn\" href=\"javascript:void(0)\" ng-click=\"vm.selectedTabIndex = 0;\">\n				<span>{{vm.rangeCustomStartEnd[0]}}</span>\n			</a>\n			<span  ng-class=\"{\'active moveLeft\':vm.selectedTabIndex===1}\">{{vm.rangeCustomStartEnd[1]}}</span>\n		</div>\n		<div ng-show=\"vm.selectedTabIndex===0\" ng-model=\"vm.startDate\" >\n			<div layout=\"row\" ng-if=\"vm.allowEmptyDates\" ng-click=\"vm.startDateSelected(\'\')\">\n				<md-button class=\"md-warn\"><small>No start date</small></md-button>\n			</div>\n			<sm-calender\n				ng-show=\"vm.view===\'DATE\'\"\n				week-start-day=\"{{vm.weekStartDay}}\"\n				min-date=\"vm.minDate\"\n				max-date=\"vm.maxDate\"\n				format=\"{{vm.format}}\"\n				date-select-call=\"vm.startDateSelected(date)\">\n			</sm-calender>\n			<sm-time\n				ng-show=\"vm.view===\'TIME\'\"\n				ng-model=\"selectedStartTime\"\n				time-select-call=\"vm.startTimeSelected(time)\">\n			</sm-time>\n		</div>\n		<div ng-if=\"vm.selectedTabIndex===1\" ng-model=\"vm.endDate\" >\n			<div layout=\"row\" layout-align=\"end\" ng-if=\"vm.allowEmptyDates\" ng-click=\"vm.endDateSelected(\'\')\">\n				<md-button class=\"md-warn\"><small>No end date</small></md-button>\n			</div>\n			<sm-calender\n				format=\"{{vm.format}}\"\n				ng-show=\"vm.view===\'DATE\'\"\n				initial-date=\"vm.minStartToDate.format(vm.format)\"\n				min-date=\"vm.minStartToDate\"\n				max-date=\"vm.maxDate\"\n				week-start-day=\"{{vm.weekStartDay}}\"\n				date-select-call=\"vm.endDateSelected(date)\">\n			</sm-calender>\n			<sm-time\n				ng-show=\"vm.view===\'TIME\'\"\n				ng-model=\"selectedEndTime\"\n				time-select-call=\"vm.endTimeSelected(time)\">\n			</sm-time>\n		</div>\n	</div>\n	<div layout=\"row\" layout-align=\"end center\">\n		<md-button type=\"button\" class=\"md-warn\" ng-if=\"vm.showClearButton\" ng-click=\"vm.clearDateRange()\">{{vm.clearLabel}}</md-button>\n		<span flex></span>\n		<md-button type=\"button\" class=\"md-primary\" ng-click=\"vm.cancel()\">{{vm.cancelLabel}}</md-button>\n		<md-button type=\"button\" class=\"md-primary\" ng-click=\"vm.dateRangeSelected()\">{{vm.okLabel}}</md-button>\n	</div>\n</md-content>\n");
