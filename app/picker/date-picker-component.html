@@ -16,7 +16,7 @@
                         data-format="{{vm.format}}" 
                         data-disable-year-selection="{{vm.disableYearSelection}}" 
                         data-week-start-day="{{vm.weekStartDay}}"
-                        data-date-select-call="vm.dateSelected(date)">
+                        data-on-date-select-call="vm.dateSelected(date)">
                     </sm-calendar-component>
                 </div>
                 <div ng-if="vm.view==='TIME'">
@@ -24,7 +24,7 @@
                         data-initial-date="vm.selectedTime"
                         data-format="HH:mm"
                         data-set-time-on-single-select="vm.setTimeOnSingleSelect"
-                        data-time-select-call="vm.timeSelected(time)">
+                        data-on-time-select-call="vm.timeSelected(time)">
                     </sm-time-component>
                 </div>
                 <div layout="row" ng-hide="(vm.closeOnSelect === 'true') && (vm.mode!=='date-time' || vm.mode!=='time')">
