@@ -165,16 +165,17 @@
       background-color: #E0E0E0; }
 
 .time-picker {
-  width: 300px; }
+  width: 300px;
+  height: 270px; }
   .time-picker .navigation {
-    height: 25px; }
+    height: 35px; }
     .time-picker .navigation .md-button {
       text-transform: capitalize;
       font-weight: bold;
       margin: 0; }
   .time-picker .time-md-repeat {
     width: 70px;
-    height: 274px; }
+    height: 235px; }
     .time-picker .time-md-repeat .repeated-item {
       width: 34px;
       margin: 0 auto;
