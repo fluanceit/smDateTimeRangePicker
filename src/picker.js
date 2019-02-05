@@ -1723,10 +1723,11 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
                             + ' server-error class="sm-input-container" />' ;
             } else {
                 if(attributes.hasOwnProperty('noInput')) {
-                    inputType = '<md-button tabindex="-1" class="sm-picker-icon md-icon-button" aria-label="showCalender" ng-disabled="vm.disable" aria-hidden="true" type="button" ng-click="vm.show()">'
+                    inputType = '<md-button tabindex="-1" class="md-icon-button" aria-label="showCalender" ng-disabled="vm.disable" aria-hidden="true" type="button" ng-click="vm.show()">'
                             + '      <md-icon md-font-icon="material-icons md-primary">{{vm.iconType}}</md-icon>'
                             + '  </md-button>' ;
-                    inputContainerStart = inputContainerEnd = '';
+                    inputContainerStart = '<div class="sm-input-container md-icon-float md-block" style="position:relative;">';
+                    inputContainerEnd = '</div>';
                 }
                 else {
                     inputType = 
@@ -1778,6 +1779,8 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
 var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $document, $parse) {
     var self = this;
 
+    debugger
+
     // properties
     self.$scope = $scope;
     self.$element = $element;
@@ -1785,6 +1788,7 @@ var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $docume
     self.$mdMedia = $mdMedia;
     self.$document = $document;
     self.isCalendarOpen = false;
+    self.noInput = $element[0].attributes.hasOwnProperty('noInput');
 
     self.calenderHeight = 320;
     self.calenderWidth = 450;
@@ -1812,14 +1816,16 @@ var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $docume
     });
 
     // if tab out hide key board
-    angular.element(self.inputPane).on('keydown', function(e) {
-        switch(e.which){
-            case 27:
-            case 9:
-                self.hideElement();
-            break;
-        }
-    });
+    if(!self.noInput) {
+        angular.element(self.inputPane).on('keydown', function(e) {
+            switch(e.which){
+                case 27:
+                case 9:
+                    self.hideElement();
+                break;
+            }
+        });
+    }
 
 };
 
