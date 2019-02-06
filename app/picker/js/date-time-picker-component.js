@@ -14,9 +14,9 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
             maxDate: '@',
             fname: '@',
             label: '@',
-            isRequired: '@',
-            disable: '=',
-            noFloatingLabel: '=',
+            isRequired: '<',
+            disable: '<',
+            noFloatingLabel: '<',
             disableYearSelection: '@',
             closeOnSelect: '<',
             changeViewOnSelect: '<',
@@ -34,7 +34,7 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
                 inputType = '<input name="{{vm.fname}}" ng-model="vm.value" '
                             + ' sm-date-time-validator="{{vm.format}}" '
                             + ' type="text" placeholder="{{vm.label}}" '
-                            + ' aria-label="{{vm.fname}}" ng-focus="vm.show()" data-ng-required="vm.isRequired"  ng-disabled="vm.disable"'
+                            + ' aria-label="{{vm.fname}}" ng-focus="vm.show()" data-ng-required="vm.isRequired"  ng-disabled="vm.disable" '
                             + ' server-error class="sm-input-container" />' ;
             } else {
                 if(attributes.hasOwnProperty('noInput')) {
@@ -341,9 +341,9 @@ function DateTimeValidator () {
 
             ngModelCtrl.$validators.dateValidation = function dateValidation(modelValue, viewValue) {
                 var value = viewValue;
-                // validate value with format
+                // validate value with format; empty is a valid value
                 var strictParsing = true;
-                return (value.length === format.length) && moment(value, format, strictParsing).isValid();
+                return (value.length === 0) || (value.length === format.length) && moment(value, format, strictParsing).isValid();
             };
         }
     }
