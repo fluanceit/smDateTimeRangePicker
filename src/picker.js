@@ -1718,7 +1718,8 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
             var inputContainerEnd = '</md-input-container>';
             if(attributes.hasOwnProperty('onFocus')) {
                 inputType = '<input name="{{vm.fname}}" ng-model="vm.value" '
-                            + 'type="text" placeholder="{{vm.label}}"'
+                            + ' sm-date-time-validator="{{vm.format}}" '
+                            + ' type="text" placeholder="{{vm.label}}" '
                             + ' aria-label="{{vm.fname}}" ng-focus="vm.show()" data-ng-required="vm.isRequired"  ng-disabled="vm.disable"'
                             + ' server-error class="sm-input-container" />' ;
             } else {
@@ -1732,6 +1733,7 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
                 else {
                     inputType = 
                         '<input class="" name="{{vm.fname}}" ng-model="vm.value" '
+                        + '             sm-date-time-validator="{{vm.format}}" '
                         + '             type="text" placeholder="{{vm.label}}" '
                         + '             aria-label="{{vm.fname}}" aria-hidden="true" data-ng-required="vm.isRequired" ng-disabled="vm.disable"/>'
                         + '     <md-button tabindex="-1" class="sm-picker-icon md-icon-button" aria-label="showCalender" ng-disabled="vm.disable" aria-hidden="true" type="button" ng-click="vm.show()">'
@@ -2011,9 +2013,32 @@ SMDateTimePickerCtrl.prototype.clickOutSideHandler = function(e){
     }
 }
 
+/**
+ * Date Validator
+ * To use in <input> to validate manual date entry
+ */
+function DateTimeValidator () {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, elem, attrs, ctrl) {
+            var ngModelCtrl = ctrl;
+            var format = attrs.smDateTimeValidator;
+
+            ngModelCtrl.$validators.dateValidation = function dateValidation(modelValue, viewValue) {
+                var value = viewValue;
+                // validate value with format
+                var strictParsing = true;
+                return (value.length === format.length) && moment(value, format, strictParsing).isValid();
+            };
+        }
+    }
+}
+
 
 var app = angular.module('smDateTimeRangePicker');
 app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', 'picker', DateTimePicker]);
+app.directive('smDateTimeValidator', DateTimeValidator);
 
 })();
 /* global moment */
