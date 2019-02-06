@@ -54,6 +54,9 @@
   top: 0%;
   left: 93%; }
 
+.sm-input-container .sm-input-align-text-right {
+  text-align: right; }
+
 .picker-container {
   border-radius: 2px; }
   .picker-container .container {
@@ -426,6 +429,9 @@
   position: absolute;
   top: 0%;
   left: 93%; }
+
+.sm-input-container .sm-input-align-text-right {
+  text-align: right; }
 
 .picker-container {
   border-radius: 2px; }
