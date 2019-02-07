@@ -21,6 +21,8 @@ angular
     pickerProvider.setOkLabel('Save');
    
     pickerProvider.setColorIntention('md-primary');
+
+    pickerProvider.setFormat('DD-MM-YYYY HH:mm');
    
 
     $urlRouterProvider.otherwise('/home');

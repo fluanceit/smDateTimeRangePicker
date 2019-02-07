@@ -528,6 +528,8 @@ if (typeof moment === 'undefined') {
 			self.mode = 'date';
         }
 
+		self.format = angular.isUndefined(self.format)? self.picker.format : self.format;
+
         if((this.mode === 'time' && !this.closeOnSelect) || (this.mode === 'date-time' && !this.changeViewOnSelect)) {
             this.setTimeOnSingleSelect = true;
         }
@@ -1687,7 +1689,7 @@ if (typeof moment === 'undefined') {
 (function() {
 
 /* global moment */
-function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
+function DateTimePicker($mdUtil, $mdMedia, $document) {
     return {
         restrict: 'E',
         require: ['^ngModel', 'smDateTimePickerComponent'],
@@ -1710,7 +1712,7 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
             showInput: '@',
             onDateSelectedCall: '&'
         },
-        controller: ['$scope', '$element', '$mdUtil', '$mdMedia', '$document','$parse', SMDateTimePickerCtrl],
+        controller: ['$scope', '$element', '$mdUtil', '$mdMedia', '$document','$parse', 'smDatePickerLocale', SMDateTimePickerCtrl],
         controllerAs: 'vm',
         bindToController :true,
         template: function (element, attributes){
@@ -1779,7 +1781,7 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
     }
 }
 
-var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $document, $parse) {
+var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $document, $parse, picker) {
     var self = this;
 
     // properties
@@ -1788,6 +1790,7 @@ var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $docume
     self.$mdUtil = $mdUtil;
     self.$mdMedia = $mdMedia;
     self.$document = $document;
+    self.picker = picker;
     self.isCalendarOpen = false;
     self.noInput = $element[0].attributes.hasOwnProperty('noInput');
 
@@ -1836,7 +1839,7 @@ SMDateTimePickerCtrl.prototype.$onInit = function() {
     this.alignTextRight = this.alignTextRight || false;
 
     // check if Pre defined format is supplied
-    this.format = angular.isUndefined(this.format) ? 'MM.DD.YYYY' : this.format;
+    this.format = angular.isUndefined(this.format) ? this.picker.format : this.format;
 
     // set icon type to display
     if(this.mode === 'time') {
@@ -2062,7 +2065,7 @@ function DateTimeValidator () {
 
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', 'smDatePickerLocale', DateTimePicker]);
+app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', DateTimePicker]);
 app.directive('smDateTimeValidator', DateTimeValidator);
 
 })();
@@ -2445,6 +2448,9 @@ function picker(){
             if(!angular.isUndefined(obj.time)){
                 customHeader.time= obj.time;
             }
+        },
+        setFormat: function(value) {
+            format = value;
         },
         $get: function(){
             return {

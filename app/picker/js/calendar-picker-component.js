@@ -46,6 +46,8 @@
 			self.mode = 'date';
         }
 
+		self.format = angular.isUndefined(self.format)? self.picker.format : self.format;
+
         if((this.mode === 'time' && !this.closeOnSelect) || (this.mode === 'date-time' && !this.changeViewOnSelect)) {
             this.setTimeOnSingleSelect = true;
         }

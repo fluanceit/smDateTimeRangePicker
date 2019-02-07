@@ -120,6 +120,9 @@ function picker(){
                 customHeader.time= obj.time;
             }
         },
+        setFormat: function(value) {
+            format = value;
+        },
         $get: function(){
             return {
                 massagePath : massagePath,
