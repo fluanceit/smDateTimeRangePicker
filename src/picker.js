@@ -1782,8 +1782,6 @@ function DateTimePicker($mdUtil, $mdMedia, $document, picker) {
 var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $document, $parse) {
     var self = this;
 
-    debugger
-
     // properties
     self.$scope = $scope;
     self.$element = $element;
@@ -1890,6 +1888,12 @@ SMDateTimePickerCtrl.prototype.configureNgModel = function(ngModelCtrl) {
     self.ngModelCtrl.$render = function() {
         self.value = self.ngModelCtrl.$viewValue;
     }
+
+    // watch for changs in <input> value
+    self.$scope.$watch('vm.value', function(value) {
+        // update local model value when <input> value changes
+        self.ngModelCtrl.$setViewValue(value);
+    });
     
 };
 
@@ -2027,11 +2031,30 @@ function DateTimeValidator () {
             var ngModelCtrl = ctrl;
             var format = attrs.smDateTimeValidator;
 
+            ngModelCtrl.$parsers.push(function(viewValue) {
+                var strictParsing = true;
+                var modelValue = undefined;
+
+                // empty view value
+                if(viewValue.length === 0) {
+                    modelValue = null;
+                }
+                else if(viewValue.length === format.length) {
+                    modelValue = moment(viewValue, format, strictParsing);
+                    if(!modelValue.isValid()) {
+                        modelValue = undefined;
+                    }
+                }
+
+                return modelValue;
+            });
+
             ngModelCtrl.$validators.dateValidation = function dateValidation(modelValue, viewValue) {
                 var value = viewValue;
                 // validate value with format; empty is a valid value
                 var strictParsing = true;
-                return (value.length === 0) || (value.length === format.length) && moment(value, format, strictParsing).isValid();
+                var isValid = (value.length === 0) || (value.length === format.length) && moment(value, format, strictParsing).isValid();
+                return isValid;
             };
         }
     }
