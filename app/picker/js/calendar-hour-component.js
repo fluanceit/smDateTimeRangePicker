@@ -12,7 +12,7 @@
                 setTimeOnSingleSelect: '<',
 				onTimeSelectCall: '&'
 			},
-			controller: ['$scope', '$mdUtil', 'picker', TimePickerCtrl],
+			controller: ['$scope', '$mdUtil', 'smDatePickerLocale', TimePickerCtrl],
             controllerAs: 'vm',
             bindToController: true,
             templateUrl: 'picker/calendar-hour-component.html'

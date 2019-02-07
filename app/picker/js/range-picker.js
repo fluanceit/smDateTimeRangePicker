@@ -19,7 +19,7 @@ function smRangePicker (picker){
             rangeSelectCall : '&'
         },
         terminal:true,
-        controller: ['$scope', 'picker', RangePickerCtrl],
+        controller: ['$scope', 'smDatePickerLocale', RangePickerCtrl],
         controllerAs : 'vm',
         bindToController:true,
         templateUrl : 'picker/range-picker.html',
@@ -245,4 +245,4 @@ RangePickerCtrl.prototype.cancel = function() {
 };
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smRangePicker', ['picker', smRangePicker]);
+app.directive('smRangePicker', ['smDatePickerLocale', smRangePicker]);

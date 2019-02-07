@@ -14,7 +14,7 @@ angular
         $templateCache.put('error-messages', response.data); 
       })
      }) 
-.config(function ($stateProvider, $urlRouterProvider,$mdThemingProvider,pickerProvider) {
+.config(['$stateProvider',  '$urlRouterProvider', '$mdThemingProvider', 'smDatePickerLocaleProvider', function ($stateProvider, $urlRouterProvider,$mdThemingProvider,pickerProvider) {
 
     pickerProvider.setDayHeader('single');
 
@@ -96,5 +96,5 @@ angular
 
     $mdThemingProvider.theme('default')
         .primaryPalette('green');
-  });
+  }]);
     

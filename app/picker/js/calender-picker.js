@@ -19,7 +19,7 @@
 				disableYearSelection: '@',
 				onSelectCall : '&'
 			},
-			controller: ['$scope', 'picker', '$mdMedia', PickerCtrl],
+			controller: ['$scope', 'smDatePickerLocale', '$mdMedia', PickerCtrl],
 			controllerAs: 'vm',
 			bindToController:true,
 			templateUrl:'picker/date-picker.html',
@@ -234,6 +234,6 @@
 	}
 
 	var app = angular.module('smDateTimeRangePicker');
-	app.directive('smDatePicker', ['$timeout', 'picker', '$mdMedia', '$window', DatePickerDir]);
-	app.directive('smTimePicker', ['$timeout', 'picker', '$mdMedia', '$window', TimePickerDir]);
+	app.directive('smDatePicker', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', DatePickerDir]);
+	app.directive('smTimePicker', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', TimePickerDir]);
 })();

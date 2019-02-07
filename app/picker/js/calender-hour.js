@@ -12,7 +12,7 @@
 				format:'@',
 				timeSelectCall : '&'
 			},
-			controller:['$scope', 'picker', TimePickerCtrl],
+			controller:['$scope', 'smDatePickerLocale', TimePickerCtrl],
 			controllerAs : 'vm',
 			templateUrl:'picker/calender-hour.html',
 			link : function(scope, element, att, ctrls){

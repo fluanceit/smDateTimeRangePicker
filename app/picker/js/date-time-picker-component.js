@@ -376,7 +376,7 @@ function DateTimeValidator () {
 
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', 'picker', DateTimePicker]);
+app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', 'smDatePickerLocale', DateTimePicker]);
 app.directive('smDateTimeValidator', DateTimeValidator);
 
 })();

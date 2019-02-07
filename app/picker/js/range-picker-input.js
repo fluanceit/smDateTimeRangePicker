@@ -225,5 +225,5 @@
     };
 
     var app = angular.module('smDateTimeRangePicker');
-    app.directive('smRangePickerInput', ['$document', '$mdMedia', '$mdUtil', 'picker', RangePickerInput]);
+    app.directive('smRangePickerInput', ['$document', '$mdMedia', '$mdUtil', 'smDatePickerLocale', RangePickerInput]);
 })();

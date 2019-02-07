@@ -119,7 +119,7 @@
                 if (!angular.isObject(options)) options = {};
 
                 return $mdDialog.show({
-                    controller:  ['$scope', '$mdDialog', '$mdMedia', '$timeout', '$mdUtil', 'picker', TimePickerServiceCtrl],
+                    controller:  ['$scope', '$mdDialog', '$mdMedia', '$timeout', '$mdUtil', 'smDatePickerLocale', TimePickerServiceCtrl],
                     controllerAs: 'vm',
                     bindToController: true,
                     clickOutsideToClose: true,

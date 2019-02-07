@@ -144,4 +144,4 @@ function picker(){
 }
 
 var app = angular.module('smDateTimeRangePicker');
-app.provider('picker', [picker]);
+app.provider('smDatePickerLocale', [picker]);

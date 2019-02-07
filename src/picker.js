@@ -27,7 +27,7 @@ if (typeof moment === 'undefined') {
                 disableYearSelection:'@',
                 onDateSelectCall: '&'
             },
-            controller: ['$scope', '$timeout', 'picker', '$mdMedia', CalenderCtrl],
+            controller: ['$scope', '$timeout', 'smDatePickerLocale', '$mdMedia', CalenderCtrl],
             controllerAs: 'vm',
             templateUrl: 'picker/calendar-date-component.html'
         };
@@ -312,7 +312,7 @@ if (typeof moment === 'undefined') {
         self.$scope.$emit('calender:close');
     };
 
-    Calender.$inject = ['picker'];
+    Calender.$inject = ['smDatePickerLocale'];
 
     CalenderCtrl.prototype.isPreviousDate = function(yearToCheck, monthToCheck)
     {
@@ -352,7 +352,7 @@ if (typeof moment === 'undefined') {
                 setTimeOnSingleSelect: '<',
 				onTimeSelectCall: '&'
 			},
-			controller: ['$scope', '$mdUtil', 'picker', TimePickerCtrl],
+			controller: ['$scope', '$mdUtil', 'smDatePickerLocale', TimePickerCtrl],
             controllerAs: 'vm',
             bindToController: true,
             templateUrl: 'picker/calendar-hour-component.html'
@@ -501,7 +501,7 @@ if (typeof moment === 'undefined') {
 				disableYearSelection: '@',
 				onSelectCall: '&'
 			},
-			controller: ['$scope', 'picker', '$mdMedia', '$mdUtil', PickerCtrl],
+			controller: ['$scope', 'smDatePickerLocale', '$mdMedia', '$mdUtil', PickerCtrl],
 			controllerAs: 'vm',
 			bindToController: true,
             templateUrl: 'picker/date-picker-component.html',
@@ -731,8 +731,8 @@ if (typeof moment === 'undefined') {
 	}
 
 	var app = angular.module('smDateTimeRangePicker');
-	app.directive('smDatePickerComponent', ['$timeout', 'picker', '$mdMedia', '$window', DatePickerDir]);
-	//app.directive('smTimePickerCp', ['$timeout', 'picker', '$mdMedia', '$window', TimePickerDir]);
+	app.directive('smDatePickerComponent', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', DatePickerDir]);
+	//app.directive('smTimePickerCp', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', TimePickerDir]);
 })();
 /* global moment */
 (function(){
@@ -754,7 +754,7 @@ if (typeof moment === 'undefined') {
                 disableYearSelection:'@',
                 dateSelectCall : '&'
             },
-            controller:['$scope', '$timeout', 'picker', '$mdMedia', CalenderCtrl],
+            controller:['$scope', '$timeout', 'smDatePickerLocale', '$mdMedia', CalenderCtrl],
             controllerAs : 'vm',
             templateUrl:'picker/calender-date.html',
             link : function(scope, element, attr, ctrls){
@@ -1101,7 +1101,7 @@ if (typeof moment === 'undefined') {
         self.$scope.$emit('calender:close');
     };
 
-    Calender.$inject = ['picker'];
+    Calender.$inject = ['smDatePickerLocale'];
 
     CalenderCtrl.prototype.isPreviousDate = function(yearToCheck, monthToCheck)
     {
@@ -1142,7 +1142,7 @@ if (typeof moment === 'undefined') {
 				format:'@',
 				timeSelectCall : '&'
 			},
-			controller:['$scope', 'picker', TimePickerCtrl],
+			controller:['$scope', 'smDatePickerLocale', TimePickerCtrl],
 			controllerAs : 'vm',
 			templateUrl:'picker/calender-hour.html',
 			link : function(scope, element, att, ctrls){
@@ -1322,7 +1322,7 @@ if (typeof moment === 'undefined') {
 				disableYearSelection: '@',
 				onSelectCall : '&'
 			},
-			controller: ['$scope', 'picker', '$mdMedia', PickerCtrl],
+			controller: ['$scope', 'smDatePickerLocale', '$mdMedia', PickerCtrl],
 			controllerAs: 'vm',
 			bindToController:true,
 			templateUrl:'picker/date-picker.html',
@@ -1537,8 +1537,8 @@ if (typeof moment === 'undefined') {
 	}
 
 	var app = angular.module('smDateTimeRangePicker');
-	app.directive('smDatePicker', ['$timeout', 'picker', '$mdMedia', '$window', DatePickerDir]);
-	app.directive('smTimePicker', ['$timeout', 'picker', '$mdMedia', '$window', TimePickerDir]);
+	app.directive('smDatePicker', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', DatePickerDir]);
+	app.directive('smTimePicker', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', TimePickerDir]);
 })();
 
 /* global moment */
@@ -1664,7 +1664,7 @@ if (typeof moment === 'undefined') {
                 if (!angular.isObject(options)) options = {};
 
                 return $mdDialog.show({
-                    controller:  ['$scope', '$mdDialog', '$mdMedia', '$timeout', '$mdUtil', 'picker', DatePickerServiceCtrl],
+                    controller:  ['$scope', '$mdDialog', '$mdMedia', '$timeout', '$mdUtil', 'smDatePickerLocale', DatePickerServiceCtrl],
                     controllerAs: 'vm',
                     bindToController: true,
                     clickOutsideToClose: true,
@@ -2062,7 +2062,7 @@ function DateTimeValidator () {
 
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', 'picker', DateTimePicker]);
+app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', 'smDatePickerLocale', DateTimePicker]);
 app.directive('smDateTimeValidator', DateTimeValidator);
 
 })();
@@ -2322,7 +2322,7 @@ SMDateTimePickerCtrl.prototype.clickOutSideHandler = function(e){
 
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smDateTimePicker', ['$mdUtil', '$mdMedia', '$document', 'picker', DateTimePicker]);
+app.directive('smDateTimePicker', ['$mdUtil', '$mdMedia', '$document', 'smDatePickerLocale', DateTimePicker]);
 
 /* global moment */
 function picker(){
@@ -2470,7 +2470,7 @@ function picker(){
 }
 
 var app = angular.module('smDateTimeRangePicker');
-app.provider('picker', [picker]);
+app.provider('smDatePickerLocale', [picker]);
 
 (function(){
 
@@ -2699,7 +2699,7 @@ app.provider('picker', [picker]);
     };
 
     var app = angular.module('smDateTimeRangePicker');
-    app.directive('smRangePickerInput', ['$document', '$mdMedia', '$mdUtil', 'picker', RangePickerInput]);
+    app.directive('smRangePickerInput', ['$document', '$mdMedia', '$mdUtil', 'smDatePickerLocale', RangePickerInput]);
 })();
 
 /* global moment */
@@ -2723,7 +2723,7 @@ function smRangePicker (picker){
             rangeSelectCall : '&'
         },
         terminal:true,
-        controller: ['$scope', 'picker', RangePickerCtrl],
+        controller: ['$scope', 'smDatePickerLocale', RangePickerCtrl],
         controllerAs : 'vm',
         bindToController:true,
         templateUrl : 'picker/range-picker.html',
@@ -2949,7 +2949,7 @@ RangePickerCtrl.prototype.cancel = function() {
 };
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smRangePicker', ['picker', smRangePicker]);
+app.directive('smRangePicker', ['smDatePickerLocale', smRangePicker]);
 
 /* global moment */
 (function(){
@@ -3072,7 +3072,7 @@ app.directive('smRangePicker', ['picker', smRangePicker]);
                 if (!angular.isObject(options)) options = {};
 
                 return $mdDialog.show({
-                    controller:  ['$scope', '$mdDialog', '$mdMedia', '$timeout', '$mdUtil', 'picker', TimePickerServiceCtrl],
+                    controller:  ['$scope', '$mdDialog', '$mdMedia', '$timeout', '$mdUtil', 'smDatePickerLocale', TimePickerServiceCtrl],
                     controllerAs: 'vm',
                     bindToController: true,
                     clickOutsideToClose: true,
@@ -3198,7 +3198,7 @@ function smTimePickerNew($mdUtil, $mdMedia, $document, $timeout, picker){
 }
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smTimePickerNew', ['$mdUtil', '$mdMedia', '$document', '$timeout', 'picker', smTimePickerNew]);
+app.directive('smTimePickerNew', ['$mdUtil', '$mdMedia', '$document', '$timeout', 'smDatePickerLocale', smTimePickerNew]);
 
 }());
 

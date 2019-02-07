@@ -17,7 +17,7 @@
                 disableYearSelection:'@',
                 onDateSelectCall: '&'
             },
-            controller: ['$scope', '$timeout', 'picker', '$mdMedia', CalenderCtrl],
+            controller: ['$scope', '$timeout', 'smDatePickerLocale', '$mdMedia', CalenderCtrl],
             controllerAs: 'vm',
             templateUrl: 'picker/calendar-date-component.html'
         };
@@ -302,7 +302,7 @@
         self.$scope.$emit('calender:close');
     };
 
-    Calender.$inject = ['picker'];
+    Calender.$inject = ['smDatePickerLocale'];
 
     CalenderCtrl.prototype.isPreviousDate = function(yearToCheck, monthToCheck)
     {

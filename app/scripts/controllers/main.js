@@ -193,7 +193,7 @@ function LeftCtrl($timeout, $mdSidenav, $mdUtil, $log) {
 }
 
 angular.module('demoApp')
-    .config(['pickerProvider',
+    .config(['smDatePickerLocaleProvider',
         function(pickerProvider) {
             pickerProvider.setCustomHeader(
                 {date: 'DD.MM', time: 'HH:mm', dateTime: 'DD.MM HH:mm'}

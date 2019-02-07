@@ -105,4 +105,4 @@ function smTimePickerNew($mdUtil, $mdMedia, $document, $timeout, picker){
 }
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smTimePickerNew', ['$mdUtil', '$mdMedia', '$document', '$timeout', 'picker', smTimePickerNew]);
+app.directive('smTimePickerNew', ['$mdUtil', '$mdMedia', '$document', '$timeout', 'smDatePickerLocale', smTimePickerNew]);

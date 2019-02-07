@@ -254,4 +254,4 @@ SMDateTimePickerCtrl.prototype.clickOutSideHandler = function(e){
 
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smDateTimePicker', ['$mdUtil', '$mdMedia', '$document', 'picker', DateTimePicker]);
+app.directive('smDateTimePicker', ['$mdUtil', '$mdMedia', '$document', 'smDatePickerLocale', DateTimePicker]);
