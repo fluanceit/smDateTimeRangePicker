@@ -1882,7 +1882,7 @@ SMDateTimePickerCtrl.prototype.configureNgModel = function(ngModelCtrl) {
 
     self.ngModelCtrl.$parsers.push(function(viewValue) {
         var date = moment(viewValue, self.format);
-        var val = (date && date.isValid()) ? date.toDate() : "";
+        var val = (date && date.isValid()) ? date.toDate() : null;
         // set local 
         self.initialDate = date;
         return val;

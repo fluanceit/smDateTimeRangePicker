@@ -13,7 +13,9 @@
             <div layout="row">
                 Date picker, Close on date select only works with &nbsp;<b> Date Picker </b>&nbsp; mode with attribute &nbsp;<b> close-on-select="true" &nbsp;</b> without floating label
             </div>
-            {{vm.employee.birthDate}}
+            :{{vm.employee.birthDate}}:
+            :isNull:{{vm.employee.birthDate === null}}:
+            :isEmpty:{{vm.employee.birthDate && vm.employee.birthDate === "" }}:
             <div   layout="row">
                     <sm-date-time-picker-component
                     fname="birthDate"
