@@ -1784,6 +1784,9 @@ function DateTimePicker($mdUtil, $mdMedia, $document) {
 var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $document, $parse, picker) {
     var self = this;
 
+    /** Used for checking whether the current user agent is on iOS or Android. */
+    var IS_MOBILE_REGEX = /ipad|iphone|ipod|android/i;
+
     // properties
     self.$scope = $scope;
     self.$element = $element;
@@ -1809,6 +1812,18 @@ var SMDateTimePickerCtrl = function($scope, $element, $mdUtil, $mdMedia, $docume
     self.calenderPan.addClass('hide hide-animate');
 
     self.bodyClickHandler = angular.bind(this, this.clickOutSideHandler);
+
+    /**
+     * Name of the event that will trigger a close. Necessary to sniff the browser, because
+     * the resize event doesn't make sense on mobile and can have a negative impact since it
+     * triggers whenever the browser zooms in on a focused input.
+     */
+    self.windowEventName = IS_MOBILE_REGEX.test(
+        navigator.userAgent || navigator.vendor || window.opera
+      ) ? 'orientationchange' : 'resize';
+
+    /** Pre-bound close handler so that the event listener can be removed. */
+    self.windowEventHandler = $mdUtil.debounce(angular.bind(this, this.hideElement), 100);
 
     self.$scope.$on('calender:close', function() {
         self.$document.off('keydown');
@@ -1883,8 +1898,10 @@ SMDateTimePickerCtrl.prototype.configureNgModel = function(ngModelCtrl) {
     self.ngModelCtrl.$parsers.push(function(viewValue) {
         var date = moment(viewValue, self.format);
         var val = (date && date.isValid()) ? date.toDate() : null;
-        // set local 
-        self.initialDate = date;
+
+        // set local (initial date for the date/time picker)
+        self.initialDate = viewValue ? moment(viewValue, self.format) : moment(); // from view value, or current date
+        
         return val;
     });
 
@@ -1952,10 +1969,11 @@ SMDateTimePickerCtrl.prototype.getVisibleViewPort = function(elementRect, bodyRe
 }
 
 
-
+/**
+ * Open Date/Time picker window
+ */
 SMDateTimePickerCtrl.prototype.show = function($event) {
     var self = this;
-
 
     var elementRect = self.inputPane.getBoundingClientRect();
     var bodyRect = document.body.getBoundingClientRect();
@@ -1985,6 +2003,8 @@ SMDateTimePickerCtrl.prototype.show = function($event) {
             self.bodyClickHandler(e);
         });
     });
+
+    window.addEventListener(self.windowEventName, self.windowEventHandler);
 }
 
 
@@ -2006,6 +2026,8 @@ SMDateTimePickerCtrl.prototype.hideElement= function() {
     }
     self.isCalendarOpen = false;
     self.$document.off('click');
+
+    window.removeEventListener(self.windowEventName, self.windowEventHandler);
 }
 
 
