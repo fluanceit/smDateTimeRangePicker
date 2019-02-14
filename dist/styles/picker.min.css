@@ -49,13 +49,20 @@
 /* 
 	Input container and button postion css
  */
-.sm-input-container .sm-picker-icon {
-  position: absolute;
-  top: 0%;
-  left: 93%; }
-
-.sm-input-container .sm-input-align-text-right {
-  text-align: right; }
+.sm-input-container {
+  /* create space for button on the right */ }
+  .sm-input-container .sm-picker-icon {
+    position: absolute;
+    top: 0%;
+    left: 93%; }
+  .sm-input-container .sm-picker-button {
+    position: absolute;
+    top: -2px;
+    right: -8px; }
+  .sm-input-container .sm-input-align-text-right {
+    text-align: right; }
+  .sm-input-container .sm-input-align-for-button {
+    margin-left: -32px; }
 
 .picker-container {
   border-radius: 2px; }
@@ -425,13 +432,20 @@
 /* 
 	Input container and button postion css
  */
-.sm-input-container .sm-picker-icon {
-  position: absolute;
-  top: 0%;
-  left: 93%; }
-
-.sm-input-container .sm-input-align-text-right {
-  text-align: right; }
+.sm-input-container {
+  /* create space for button on the right */ }
+  .sm-input-container .sm-picker-icon {
+    position: absolute;
+    top: 0%;
+    left: 93%; }
+  .sm-input-container .sm-picker-button {
+    position: absolute;
+    top: -2px;
+    right: -8px; }
+  .sm-input-container .sm-input-align-text-right {
+    text-align: right; }
+  .sm-input-container .sm-input-align-for-button {
+    margin-left: -32px; }
 
 .picker-container {
   border-radius: 2px; }

@@ -82,13 +82,22 @@ $aniimation-duration:			1s;
 	Input container and button postion css
  */
 .sm-input-container{
-	& .sm-picker-icon{    
+	& .sm-picker-icon {    
 	    position: absolute;
 	    top: 0%;
 	    left: 93%;
 	}
+	& .sm-picker-button {    
+		position: absolute;
+		top: -2px;
+		right: -8px;
+	}
 	& .sm-input-align-text-right {
 			text-align: right;
+	}
+	/* create space for button on the right */
+	& .sm-input-align-for-button {
+			margin-left: -32px;
 	}
 }
 
