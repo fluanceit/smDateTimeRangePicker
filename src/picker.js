@@ -2076,9 +2076,9 @@ function DateTimeValidator () {
 
             ngModelCtrl.$validators.dateValidation = function dateValidation(modelValue, viewValue) {
                 var value = viewValue;
-                // validate value with format; empty is a valid value
+                // validate value with format; null/empty is a valid value
                 var strictParsing = true;
-                var isValid = (value.length === 0) || (value.length === format.length) && moment(value, format, strictParsing).isValid();
+                var isValid = (value === null) || (value.length === 0) || (value.length === format.length) && moment(value, format, strictParsing).isValid();
                 return isValid;
             };
         }

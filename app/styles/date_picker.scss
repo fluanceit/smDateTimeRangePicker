@@ -87,10 +87,12 @@ $aniimation-duration:			1s;
 	    top: 0%;
 	    left: 93%;
 	}
-	& .sm-picker-button {    
+	& .sm-picker-button {
+		margin: 0;
+		padding: 8px 0;
+		width: 24px;    
 		position: absolute;
 		top: -2px;
-		right: -8px;
 	}
 	& .sm-input-align-text-right {
 			text-align: right;

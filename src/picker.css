@@ -56,9 +56,11 @@
     top: 0%;
     left: 93%; }
   .sm-input-container .sm-picker-button {
+    margin: 0;
+    padding: 8px 0;
+    width: 24px;
     position: absolute;
-    top: -2px;
-    right: -8px; }
+    top: -2px; }
   .sm-input-container .sm-input-align-text-right {
     text-align: right; }
   .sm-input-container .sm-input-align-for-button {
