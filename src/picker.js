@@ -1861,7 +1861,7 @@ SMDateTimePickerCtrl.prototype.$onInit = function() {
         this.iconType = 'access_time';
     }
     else {
-        this.iconType = 'date_range';
+        this.iconType = 'insert_invitation';
     }
 }
 
