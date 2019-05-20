@@ -37,7 +37,8 @@
         self.$timeout = $timeout;
         self.picker = picker;
         self.dayHeader = self.picker.dayHeader;
-        self.colorIntention = picker.colorIntention;        
+        self.colorIntention = picker.colorIntention;
+        self.backToCalendar = picker.backToCalendar;
 
         self.viewModeSmall = $mdMedia('xs');
 
@@ -55,7 +56,7 @@
 
         // use component lifecycle hooks
         self.$onInit = onInit;
-        
+
         function onInit() {
             self.initialDate = $scope.initialDate;
             self.startDay = angular.isUndefined($scope.weekStartDay) || $scope.weekStartDay==='' ? 'Sunday' : $scope.weekStartDay ;
@@ -69,7 +70,7 @@
             self.format = angular.isUndefined(self.format) ? 'MM-DD-YYYY': self.format;
             self.initialDate =	angular.isUndefined(self.initialDate) ? moment() : moment(self.initialDate, self.format);
             self.currentDate = self.initialDate.clone();
-    
+
             if(self.restrictToMinDate){
                 if(!moment.isMoment(self.minDate)){
                    self.minDate = moment(self.minDate, self.format);
@@ -91,22 +92,22 @@
                     self.maxYear = self.maxDate.year();
                 }
             }
-    
+
             self.yearItems = {
                 currentIndex_: 1,
                 PAGE_SIZE: 7,
                 START: self.minYear,
                 getItemAtIndex: function(index) {
                     if(!this.START+ index<=(self.maxYear)) {
-                        return (this.START+ index); 
+                        return (this.START+ index);
                     }else{
                         return this.START ;
                     }
-    
+
                     if(this.currentIndex_ < index){
                         this.currentIndex_ = index;
-                        return this.START + index;                    
-                    } 
+                        return this.START + index;
+                    }
                     if(this.currentIndex_ < index){
                         this.currentIndex_ = index;
                     }
@@ -116,7 +117,7 @@
                     return this.currentIndex_ + Math.floor(this.PAGE_SIZE / 2);
                 }
             };
-    
+
 			self.init();
 		}
     };
@@ -261,7 +262,7 @@
             self.moveCalenderAnimation='slideLeft';
             self.initialDate.subtract(1, 'M');
         }else{
-            console.log(self.stopScrollNext);            
+            console.log(self.stopScrollNext);
             if(self.stopScrollNext) return;
             self.moveCalenderAnimation='slideRight';
             self.initialDate.add(1, 'M');
@@ -295,9 +296,9 @@
         for (key in daysByName) {
             keys.push(key);
         }
-        
+
         var startIndex = moment().day(self.startDay).day(), count = 0;
-        
+
         for (key in daysByName) {
             self.dateCellHeader.push(daysByName[ keys[ (count + startIndex) % (keys.length)] ]);
             count++; // Don't forget to increase count.

@@ -57,7 +57,7 @@
         self.dateCells = [];
         self.monthList = self.picker.monthShortNames ? self.picker.monthShortNames : moment.monthsShort();
         self.moveCalenderAnimation = '';
-        self.backToCalendar = angular.isUndefined(self.picker.backToCalendar) ? 'Back to calendar' : self.picker.backToCalendar;
+        self.backToCalendar = self.picker.backToCalendar;
 
         self.format = angular.isUndefined(self.format) ? 'MM-DD-YYYY': self.format;
 

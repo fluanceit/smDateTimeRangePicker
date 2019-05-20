@@ -23,9 +23,13 @@ function picker(){
         {'single':'S', 'shortName':'Sa', 'fullName':'Saturday'}
     ];
 
-    var colorIntention = 'md-primary';    
+    var colorIntention = 'md-primary';
 
     var dayHeader = 'single';
+
+    var hoursTranslation = 'Hours';
+    var minutesTranslation = 'Minutes';
+    var backToCalendar = 'Back to calendar';
 
     var monthNames = moment.months();
 
@@ -135,6 +139,10 @@ function picker(){
                 monthNames:monthNames,
                 dayHeader :dayHeader,
                 customHeader:customHeader,
+
+                hoursTranslation: hoursTranslation,
+                minutesTranslation: minutesTranslation,
+                backToCalendar: backToCalendar,
 
                 rangeDivider : rangeDivider,
                 rangeCustomStartEnd : rangeCustomStartEnd,

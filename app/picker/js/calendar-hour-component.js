@@ -38,8 +38,8 @@
 		self.hourSet =false;
 		self.minuteSet = false;
         self.show = true;
-        self.hoursTranslation = angular.isUndefined(self.picker.hoursTranslation) ? 'Hours' : self.picker.hoursTranslation;
-        self.minutesTranslation = angular.isUndefined(self.picker.minutesTranslation) ? 'Minutes' : self.picker.minutesTranslation;
+        self.hoursTranslation = self.picker.hoursTranslation;
+        self.minutesTranslation = self.picker.minutesTranslation;
 
         //self.initialDate = this.initialTime; 	//if calender to be  initiated with specific date
         self.format = angular.isUndefined(this.format) ? 'HH:mm': self.format;

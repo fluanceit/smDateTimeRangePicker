@@ -1,31 +1,31 @@
 <div  class="time-picker" layout="row" layout-align="center center">
 	<div>
 		<div layout="row" class="navigation">
-			<span class="md-button">Hour</span>
-			<span class="md-button">Minute</span>
+			<span class="md-button">{{vm.hoursTranslation}}</span>
+			<span class="md-button">{{vm.minutesTranslation}}</span>
 		</div>
 		<!--div style="background-color: rgba(120,120,120,0.5); position: relative; top: 132px;" class="navigation"></div-->
 		<div layout="row" >
 			<md-virtual-repeat-container flex="50"  id="hour-container{{vm.uid}}" class="time-md-repeat" md-top-index="vm.hourTopIndex">
 			<div md-virtual-repeat="h in vm.hourItems" class="repeated-item">
-						<md-button class="md-icon-button" 
-							ng-click="vm.setHour(h.hour)" 							
+						<md-button class="md-icon-button"
+							ng-click="vm.setHour(h.hour)"
 							ng-class="{'{{vm.colorIntention}}': h.isCurrent,
 									'{{vm.colorIntention}} md-raised' :h.hour===vm.currentDate.hour()}">
 							{{h.hour}}
 						</md-button>
 			</div>
-			</md-virtual-repeat-container>	
+			</md-virtual-repeat-container>
 			<md-virtual-repeat-container flex="50" id="minute-container{{vm.uid}}" class="time-md-repeat" md-top-index="vm.minuteTopIndex">
 				<div md-virtual-repeat="m in vm.minuteCells"  class="repeated-item">
-						<md-button class="md-icon-button" 
-							ng-click="vm.setMinute(m.minute)" 							
+						<md-button class="md-icon-button"
+							ng-click="vm.setMinute(m.minute)"
 							ng-class="{'{{vm.colorIntention}}': m.isCurrent,
 								'{{vm.colorIntention}} md-raised' :m.minute===vm.currentDate.minute()}">
 							{{m.minute}}
 						</md-button>
 				</div>
-			</md-virtual-repeat-container>		     
-		</div>	
+			</md-virtual-repeat-container>
+		</div>
 	</div>
 </div>

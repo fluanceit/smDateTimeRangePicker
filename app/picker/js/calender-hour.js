@@ -30,12 +30,14 @@
 		self.uid = Math.random().toString(36).substr(2, 5);
 		self.$scope = $scope;
 		self.picker = picker;
-		self.colorIntention = picker.colorIntention;		
+		self.colorIntention = picker.colorIntention;
 		self.format = $scope.format;
 		self.hourItems =[];
 		self.minuteCells =[];
 		self.hourSet =false;
 		self.minuteSet = false;
+        self.hoursTranslation = picker.hoursTranslation;
+        self.minutesTranslation = picker.minutesTranslation;
 
 		self.show=true;
 
@@ -47,7 +49,7 @@
 			self.format = angular.isUndefined(self.format) ? 'HH:mm': self.format;
 			self.initialDate =	angular.isUndefined(self.initialDate)? moment() : moment(self.initialDate, self.format);
 			self.currentDate = self.initialDate.clone();
-	
+
 			self.init();
 		}
 	}
