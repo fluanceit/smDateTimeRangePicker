@@ -39,7 +39,7 @@
         var MAX_YEAR = 2100;
 
         self.dayHeader = self.picker.dayHeader;
-        self.colorIntention = self.picker.colorIntention;        
+        self.colorIntention = self.picker.colorIntention;
         self.initialDate = self.$scope.initialDate;
         self.viewModeSmall = self.$mdMedia('xs');
         self.startDay = angular.isUndefined(self.$scope.weekStartDay) || self.$scope.weekStartDay==='' ? 'Sunday' : self.$scope.weekStartDay ;
@@ -55,8 +55,9 @@
         self.monthCells=[];
         self.dateCellHeader= [];
         self.dateCells = [];
-        self.monthList = moment.monthsShort();
+        self.monthList = self.picker.monthShortNames ? self.picker.monthShortNames : moment.monthsShort();
         self.moveCalenderAnimation = '';
+        self.backToCalendar = angular.isUndefined(self.picker.backToCalendar) ? 'Back to calendar' : self.picker.backToCalendar;
 
         self.format = angular.isUndefined(self.format) ? 'MM-DD-YYYY': self.format;
 
@@ -202,7 +203,7 @@
             self.moveCalenderAnimation='slideLeft';
             self.initialDate.subtract(1, 'M');
         }else{
-            console.log(self.stopScrollNext);            
+            console.log(self.stopScrollNext);
             if(self.stopScrollNext) return;
             self.moveCalenderAnimation='slideRight';
             self.initialDate.add(1, 'M');
@@ -233,9 +234,9 @@
         for (key in daysByName) {
             keys.push(key);
         }
-        
+
         var startIndex = moment().day(self.startDay).day(), count = 0;
-        
+
         for (key in daysByName) {
             self.dateCellHeader.push(daysByName[ keys[ (count + startIndex) % (keys.length)] ]);
             count++; // Don't forget to increase count.

@@ -1,10 +1,10 @@
 <div class="date-picker">
         <div ng-class="{'year-container' : vm.view==='YEAR_MONTH'}" ng-show="vm.view==='YEAR_MONTH'" layout="column">
-            <a href="javascript:void(0)" class="cal-link" ng-click="vm.view = 'DATE'">Back to calendar</a>
+            <a href="javascript:void(0)" class="cal-link" ng-click="vm.view = 'DATE'">{{vm.backToCalendar}}</a>
             <md-virtual-repeat-container class="year-md-repeat" id="year-container" md-top-index="vm.yearTopIndex">
                 <div class="repeated-item" md-on-demand="" md-virtual-repeat="yr in vm.yearItems">
                         <div class="year" ng-class="{'md-primary': yr === vm.currentDate.year(), 'selected-year md-primary ':vm.initialDate.year()===yr}">
-                             <span class="year-num" ng-click="vm.changeYear(yr,vm.currentDate.month())">{{yr}}</span> 
+                             <span class="year-num" ng-click="vm.changeYear(yr,vm.currentDate.month())">{{yr}}</span>
                              <div class="month-list">
                                 <div class="month-row" >
                                     <span ng-click="vm.changeYear(yr,0)" class="month">{{vm.monthList[0]}}</span>
@@ -22,7 +22,7 @@
                                     <span ng-click="vm.changeYear(yr,10)" class="month">{{vm.monthList[10]}}</span>
                                     <span ng-click="vm.changeYear(yr,11)" class="month">{{vm.monthList[11]}}</span>
                                 </div>
-                             </div>                  
+                             </div>
                         </div>
                         <md-divider></md-divider>
                 </div>
@@ -65,4 +65,3 @@
             </div>
         </div>
     </div>
-    

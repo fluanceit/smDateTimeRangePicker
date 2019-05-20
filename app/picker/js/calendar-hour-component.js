@@ -22,7 +22,7 @@
 	var TimePickerCtrl = function($scope, $mdUtil, picker){
         var self = this;
         self.MIDDLE_INDEX = 3;
-        
+
         self.$scope = $scope;
         self.$mdUtil = $mdUtil;
         self.picker = picker;
@@ -30,15 +30,17 @@
 
 	TimePickerCtrl.prototype.$onInit = function(){
         var self = this;
-        
+
 		self.uid = Math.random().toString(36).substr(2, 5);
-		self.colorIntention = self.picker.colorIntention;		
+		self.colorIntention = self.picker.colorIntention;
 		self.hourItems =[];
 		self.minuteCells =[];
 		self.hourSet =false;
 		self.minuteSet = false;
         self.show = true;
-        
+        self.hoursTranslation = angular.isUndefined(self.picker.hoursTranslation) ? 'Hours' : self.picker.hoursTranslation;
+        self.minutesTranslation = angular.isUndefined(self.picker.minutesTranslation) ? 'Minutes' : self.picker.minutesTranslation;
+
         //self.initialDate = this.initialTime; 	//if calender to be  initiated with specific date
         self.format = angular.isUndefined(this.format) ? 'HH:mm': self.format;
 		self.initialDate =	angular.isUndefined(self.initialDate)? moment() : moment(self.initialDate, self.format);
