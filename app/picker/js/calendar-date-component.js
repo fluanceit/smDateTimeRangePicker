@@ -31,6 +31,18 @@
         self.picker = picker;
         self.$mdMedia = $mdMedia;
         self.backToCalendar = self.picker.backToCalendar;
+        self.todayTranslation = self.picker.todayTranslation;
+
+        self.todayDisabled =
+
+        self.setToday = function () {
+            if (!self.isTodayDisabled) {
+                var today = moment();
+                self.$scope.initialDate = today;
+                self.selectDate(today, false);
+                self.$onInit();
+            }
+        }
     };
 
     CalenderCtrl.prototype.$onInit = function(){
@@ -99,6 +111,19 @@
                 return this.END - this.START;
             }
         };
+
+        var today = moment();
+        self.isTodayDisabled = false;
+
+        if(self.restrictToMinDate && !angular.isUndefined(self.minDate) && !self.isTodayDisabled)
+        {
+            self.isTodayDisabled = self.minDate.isAfter(today);
+        }
+
+        if(self.restrictToMaxDate && !angular.isUndefined(self.maxDate) && !self.isTodayDisabled)
+        {
+            self.isTodayDisabled = self.maxDate.isBefore(today);
+        }
 
         self.buildDateCells();
         self.buildDateCellHeader();

@@ -46,7 +46,7 @@
     bottom: 0;
     width: 100%; } }
 
-/* 
+/*
 	Input container and button postion css
  */
 .sm-input-container {
@@ -101,7 +101,7 @@
 
 .date-picker {
   width: 300px;
-  height: 270px; }
+  height: 310px; }
   .date-picker .cal-link {
     font-size: 0.7em;
     text-align: center;
@@ -431,7 +431,7 @@
     bottom: 0;
     width: 100%; } }
 
-/* 
+/*
 	Input container and button postion css
  */
 .sm-input-container {
@@ -486,7 +486,7 @@
 
 .date-picker {
   width: 300px;
-  height: 270px; }
+  height: 310px; }
   .date-picker .cal-link {
     font-size: 0.7em;
     text-align: center;

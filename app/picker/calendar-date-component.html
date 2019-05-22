@@ -63,5 +63,10 @@
                     </md-button>
                 </div>
             </div>
+            <div class="date-action">
+                <md-button class="md-button {{vm.colorIntention}}" ng-click="vm.setToday()" ng-disabled="vm.isTodayDisabled">
+                    {{vm.todayTranslation}}
+                </md-button>
+            </div>
         </div>
     </div>

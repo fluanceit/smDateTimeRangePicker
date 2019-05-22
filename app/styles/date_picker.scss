@@ -10,7 +10,7 @@ $date-cell-width:				30px;
 $date-cell-line-width:			40px;
 $calender-bg:					#fff;
 $bg-date-cell-selected:			#E0E0E0;
-$font-size:						13px;		
+$font-size:						13px;
 $today-border-color:			#106CC8;
 $disabled-date-text-color:		#ccc1c1;
 $aniimation-timing-fun:			cubic-bezier(.04,1.01,.13,1.02);
@@ -21,35 +21,35 @@ $aniimation-duration:			1s;
 	position:fixed;
   	z-index:81;
   	overflow: hidden;
-	border-radius:2px;  	
+	border-radius:2px;
   	&.hide-animate {
    	-webkit-transition: all $aniimation-duration  $aniimation-timing-fun;
 	   -moz-transition: all $aniimation-duration  $aniimation-timing-fun;
   		 -o-transition: all $aniimation-duration  $aniimation-timing-fun;
-  		    transition: all $aniimation-duration  $aniimation-timing-fun; 
+  		    transition: all $aniimation-duration  $aniimation-timing-fun;
  	    max-height: 0px;
-	    max-width: 0px; 
+	    max-width: 0px;
 	}
 	&.show {
    	-webkit-transition: all $aniimation-duration  $aniimation-timing-fun;
 	   -moz-transition: all $aniimation-duration  $aniimation-timing-fun;
   		 -o-transition: all $aniimation-duration  $aniimation-timing-fun;
-  		    transition: all $aniimation-duration  $aniimation-timing-fun; 
+  		    transition: all $aniimation-duration  $aniimation-timing-fun;
  	    max-height: 500px;
-	    max-width: 450px; 
-	} 
+	    max-width: 450px;
+	}
 	.action{
 	  height: 30px;
 	  margin-bottom: 0;
 	  position: absolute;
 	  bottom: 0;
-	  width: 100%; 
-	}	 	
+	  width: 100%;
+	}
 }
 
-@media only screen 
-  and (min-device-width: 0px) 
-  and (max-device-width: 960px)  
+@media only screen
+  and (min-device-width: 0px)
+  and (max-device-width: 960px)
  {
 	.sm-calender-pane{
 	  	overflow: hidden;
@@ -66,23 +66,23 @@ $aniimation-duration:			1s;
 	  		 -o-animation: scaleUpCal $aniimation-duration  $aniimation-timing-fun;
 	  		    animation: scaleUpCal $aniimation-duration  $aniimation-timing-fun;
 
-		}  	
+		}
 	}
 	.action{
 	  height: 30px;
 	  margin-bottom: 0;
 	  position: absolute;
 	  bottom: 0;
-	  width: 100%; 
+	  width: 100%;
 	}
 }
 
 
-/* 
+/*
 	Input container and button postion css
  */
 .sm-input-container{
-	& .sm-picker-icon {    
+	& .sm-picker-icon {
 	    position: absolute;
 	    top: 0%;
 	    left: 93%;
@@ -109,7 +109,7 @@ $aniimation-duration:			1s;
 		border-radius:2px;
 		overflow: hidden;
 		md-toolbar{
-			word-wrap: break-word;			
+			word-wrap: break-word;
 			&.md-height{
 				padding: 20px 0 10px 0;
 				&.landscape{
@@ -145,15 +145,15 @@ $aniimation-duration:			1s;
 					}
 
 				}
-			}				
+			}
 		}
-	}	
+	}
 }
 
 
 .date-picker{
-	width: 300px;	
-	height: 270px;
+	width: 300px;
+	height: 310px;
 	.cal-link
 	{
 		font-size: 0.7em;
@@ -170,7 +170,7 @@ $aniimation-duration:			1s;
 			.md-virtual-repeat-container{
 				width: 240px;
 				height: 239px;
-			}				
+			}
 			.repeated-item {
 				box-sizing: border-box;
 				height: 70px;
@@ -230,18 +230,18 @@ $aniimation-duration:			1s;
 			height: 40px;
 			.md-button{
 				text-transform: capitalize;
-				font-weight: bold;				
+				font-weight: bold;
 				&.md-icon-button{
-					
+
 				}
 			}
-		}	
+		}
 		> .date-cell-header{
 			cursor: default;
 			> .md-button{
 				&.md-icon-button{
 					opacity: 1;
-    				margin: 2px 0 2px 2px;					
+    				margin: 2px 0 2px 2px;
 				}
 			}
 		}
@@ -256,14 +256,14 @@ $aniimation-duration:			1s;
 					&[disabled]{
 						cursor: default;
 						background-color: transparent;
-					}	
+					}
 					&:hover:not(.disabled):not(.selected){
 						background-color: $bg-date-cell-selected;
-					}					
-				}							
+					}
+				}
 			}
-		}	
-	}				   
+		}
+	}
 }
 
 .time-picker{
@@ -274,9 +274,9 @@ $aniimation-duration:			1s;
 		.md-button{
 			text-transform: capitalize;
 			font-weight: bold;
-			margin:0;				
+			margin:0;
 			&.md-icon-button{
-					
+
 			}
 		}
 	}
@@ -290,7 +290,7 @@ $aniimation-duration:			1s;
 			height: 34px;
 			overflow: hidden;
 			> .md-button{
-				margin: 2px;	
+				margin: 2px;
 				&.md-icon-button{
 					height: $date-cell-height;
 					width: $date-cell-width;
@@ -298,9 +298,9 @@ $aniimation-duration:			1s;
 					padding:0px;
 					font-size: 13px;
 				}
-			}			
+			}
 		}
-	}		
+	}
 
 }
 
@@ -309,10 +309,10 @@ $aniimation-duration:			1s;
 	padding-right:20px;
 }
 .slideLeft{
-	animation: slideInLeft 500ms cubic-bezier(.06,.61,.04,1.03);   								
+	animation: slideInLeft 500ms cubic-bezier(.06,.61,.04,1.03);
 }
 .slideRight{
-	animation: slideInRight 500ms cubic-bezier(.06,.61,.04,1.03);   								
+	animation: slideInRight 500ms cubic-bezier(.06,.61,.04,1.03);
 }
 
 
@@ -324,14 +324,14 @@ $aniimation-duration:			1s;
 		font-size:calc(#{$font-size} + 2);
 		.date-display{
 			width: 130px;
-			padding: 2px; 
-			text-align: center;			
+			padding: 2px;
+			text-align: center;
 		}
 		.divider-display{
 			width: 20px;
 			font-size:$font-size;
-			padding: 2px; 
-		}		
+			padding: 2px;
+		}
 	}
 	.pre-select{
 		height: 307px;
@@ -364,18 +364,18 @@ $aniimation-duration:			1s;
 						color:inherit;
 						border-bottom:2px solid #FF5252;
 						&.moveLeft{
-							animation: slideInLeft 1s cubic-bezier(.06,.61,.04,1.03);								
+							animation: slideInLeft 1s cubic-bezier(.06,.61,.04,1.03);
 						}
 						&.moveRight{
-							animation: slideInRight 1s cubic-bezier(.06,.61,.04,1.03);								
-						}	
+							animation: slideInRight 1s cubic-bezier(.06,.61,.04,1.03);
+						}
 					}
 				}
 			}
 		}
-	
+
 	}
-}	
+}
 
 @keyframes slideInLeft {
   from {
@@ -448,11 +448,11 @@ $aniimation-duration:			1s;
     100% {
       -ms-transform: scale(1,1); /* IE 9 */
       -webkit-transform: scale(1,1); /* Safari */
-      transform: scale(1,1);    
+      transform: scale(1,1);
     }
-} 
+}
 
-/* Standard syntax */ 
+/* Standard syntax */
 @keyframes scaleUpCal {
     0%   {
       -ms-transform: scale(.5,.5); /* IE 9 */
@@ -463,7 +463,7 @@ $aniimation-duration:			1s;
     100% {
       -ms-transform: scale(1,1); /* IE 9 */
       -webkit-transform: scale(1,1); /* Safari */
-      transform: scale(1,1);    
+      transform: scale(1,1);
     }
 }
 
@@ -471,7 +471,7 @@ $aniimation-duration:			1s;
     0%   {
       -ms-transform: scale(1,1); /* IE 9 */
       -webkit-transform: scale(1,1); /* Safari */
-      transform: scale(1,1);    
+      transform: scale(1,1);
   }
 
     100% {
@@ -479,14 +479,14 @@ $aniimation-duration:			1s;
       -webkit-transform: scale(.5,.5); /* Safari */
       transform: scale(.5,.5);
     }
-} 
+}
 
-/* Standard syntax */ 
+/* Standard syntax */
 @keyframes scaleDownCal {
     0%   {
       -ms-transform: scale(1,1); /* IE 9 */
       -webkit-transform: scale(1,1); /* Safari */
-      transform: scale(1,1);    
+      transform: scale(1,1);
   }
 
     100% {
@@ -506,11 +506,11 @@ $aniimation-duration:			1s;
     100% {
       -ms-transform: top; /* IE 9 */
       -webkit-transform: top; /* Safari */
-      transform: top;     
+      transform: top;
     }
-} 
+}
 
-/* Standard syntax */ 
+/* Standard syntax */
 @keyframes moveUp {
     0%   {
       -ms-transform: top; /* IE 9 */
@@ -521,6 +521,6 @@ $aniimation-duration:			1s;
     100% {
       -ms-transform: top; /* IE 9 */
       -webkit-transform: top; /* Safari */
-      transform: top;     
+      transform: top;
     }
 }

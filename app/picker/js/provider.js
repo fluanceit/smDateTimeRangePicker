@@ -29,6 +29,7 @@ function picker(){
 
     var hoursTranslation = 'Hours';
     var minutesTranslation = 'Minutes';
+    var todayTranslation = 'Today';
     var backToCalendar = 'Back to calendar';
 
     var monthNames = moment.months();
@@ -142,6 +143,7 @@ function picker(){
 
                 hoursTranslation: hoursTranslation,
                 minutesTranslation: minutesTranslation,
+                todayTranslation: todayTranslation,
                 backToCalendar: backToCalendar,
 
                 rangeDivider : rangeDivider,
