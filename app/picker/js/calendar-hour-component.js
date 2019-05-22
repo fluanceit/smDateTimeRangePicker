@@ -26,6 +26,8 @@
         self.$scope = $scope;
         self.$mdUtil = $mdUtil;
         self.picker = picker;
+        self.hoursTranslation = self.picker.hoursTranslation;
+        self.minutesTranslation = self.picker.minutesTranslation;
 	}
 
 	TimePickerCtrl.prototype.$onInit = function(){
@@ -38,8 +40,6 @@
 		self.hourSet =false;
 		self.minuteSet = false;
         self.show = true;
-        self.hoursTranslation = self.picker.hoursTranslation;
-        self.minutesTranslation = self.picker.minutesTranslation;
 
         //self.initialDate = this.initialTime; 	//if calender to be  initiated with specific date
         self.format = angular.isUndefined(this.format) ? 'HH:mm': self.format;

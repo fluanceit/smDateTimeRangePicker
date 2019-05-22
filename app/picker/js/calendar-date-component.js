@@ -30,6 +30,7 @@
         self.$timeout = $timeout;
         self.picker = picker;
         self.$mdMedia = $mdMedia;
+        self.backToCalendar = self.picker.backToCalendar;
     };
 
     CalenderCtrl.prototype.$onInit = function(){
@@ -57,7 +58,6 @@
         self.dateCells = [];
         self.monthList = self.picker.monthShortNames ? self.picker.monthShortNames : moment.monthsShort();
         self.moveCalenderAnimation = '';
-        self.backToCalendar = self.picker.backToCalendar;
 
         self.format = angular.isUndefined(self.format) ? 'MM-DD-YYYY': self.format;
 
