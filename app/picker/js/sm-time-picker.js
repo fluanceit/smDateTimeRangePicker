@@ -75,11 +75,11 @@ function smTimePickerNew($mdUtil, $mdMedia, $document, $timeout, picker){
 
                 var top =elementRect.top;
                 if(elementRect.top +calenderHeight > bodyRect.bottom){
-                    top = elementRect.top - ((elementRect.top + calenderHeight) - (bodyRect.bottom + 20));
+                    top = elementRect.top - ((elementRect.top + calenderHeight) - (bodyRect.bottom - 20));
                 }
                 var left = elementRect.left;
                 if(elementRect.left +calenderWidth > bodyRect.right){
-                    left = elementRect.left - ((elementRect.left + calenderWidth) - (bodyRect.right + 10));
+                    left = elementRect.left - ((elementRect.left + calenderWidth) - (bodyRect.right - 10));
                 }
                 return {top : top, left : left };
             }
