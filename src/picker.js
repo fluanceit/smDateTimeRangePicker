@@ -2296,11 +2296,11 @@ SMDateTimePickerCtrl.prototype.getVisibleViewPort = function(elementRect, bodyRe
 
     var top = elementRect.top;
     if (elementRect.top + self.calenderHeight > bodyRect.bottom) {
-        top = elementRect.top - ((elementRect.top + self.calenderHeight) - (bodyRect.bottom - 20));
+        top = elementRect.top - ((elementRect.top + self.calenderHeight) - (bodyRect.bottom + 20));
     }
     var left = elementRect.left;
     if (elementRect.left + self.calenderWidth > bodyRect.right) {
-        left = elementRect.left - ((elementRect.left + self.calenderWidth) - (bodyRect.right - 10));
+        left = elementRect.left - ((elementRect.left + self.calenderWidth) - (bodyRect.right + 10));
     }
     return {
         top: top,
