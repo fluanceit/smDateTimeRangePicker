@@ -46,13 +46,25 @@
     bottom: 0;
     width: 100%; } }
 
-/* 
+/*
 	Input container and button postion css
  */
-.sm-input-container .sm-picker-icon {
-  position: absolute;
-  top: 0%;
-  left: 93%; }
+.sm-input-container {
+  /* create space for button on the right */ }
+  .sm-input-container .sm-picker-icon {
+    position: absolute;
+    top: 0%;
+    left: 93%; }
+  .sm-input-container .sm-picker-button {
+    /*margin: 0;*/
+    padding: 8px 0;
+    /*width: 24px;*/
+    position: absolute;
+    top: -2px; }
+  .sm-input-container .sm-input-align-text-right {
+    text-align: right; }
+  .sm-input-container .sm-input-align-for-button {
+    margin-left: -32px; }
 
 .picker-container {
   border-radius: 2px; }
@@ -68,11 +80,12 @@
           .picker-container .container md-toolbar.md-height.landscape .year-header {
             margin: 10px;
             font-size: 16px; }
+          .picker-container .container md-toolbar.md-height.landscape .time-header {
+            font-size: 40px;
+            margin: 10px auto; }
           .picker-container .container md-toolbar.md-height.landscape .date-time-header {
             font-size: 28px;
-            font-weight: bold;
-            text-align: left;
-            margin: 0px 0 15px 10px; }
+            margin: 0 0 15px 10px; }
       .picker-container .container md-toolbar.md-height {
         padding: 5px 10px; }
         .picker-container .container md-toolbar.md-height.portrait {
@@ -80,14 +93,15 @@
           .picker-container .container md-toolbar.md-height.portrait .year-header {
             margin: 10px 0;
             font-size: 16px; }
+          .picker-container .container md-toolbar.md-height.portrait .time-header {
+            font-size: 40px;
+            margin: 10px auto; }
           .picker-container .container md-toolbar.md-height.portrait .date-time-header {
-            font-size: 32px;
-            font-weight: bold;
-            text-align: left; }
+            font-size: 32px; }
 
 .date-picker {
   width: 300px;
-  height: 270px; }
+  height: 310px; }
   .date-picker .cal-link {
     font-size: 0.7em;
     text-align: center;
@@ -163,19 +177,23 @@
       background-color: #E0E0E0; }
 
 .time-picker {
-  width: 300px; }
+  width: 300px;
+  height: 270px; }
   .time-picker .navigation {
-    height: 25px; }
+    height: 35px; }
     .time-picker .navigation .md-button {
       text-transform: capitalize;
       font-weight: bold;
       margin: 0; }
   .time-picker .time-md-repeat {
     width: 70px;
-    height: 239px; }
+    height: 235px; }
     .time-picker .time-md-repeat .repeated-item {
       width: 34px;
-      margin: 0 auto; }
+      margin: 0 auto;
+      box-sizing: border-box;
+      height: 34px;
+      overflow: hidden; }
       .time-picker .time-md-repeat .repeated-item > .md-button {
         margin: 2px; }
         .time-picker .time-md-repeat .repeated-item > .md-button.md-icon-button {
@@ -218,6 +236,12 @@
     height: 43px;
     text-align: center;
     line-height: 35px; }
+    .range-picker .custom-select.show-calender > .tab-head .start-btn {
+      width: 50%;
+      text-decoration: inherit;
+      color: inherit; }
+      .range-picker .custom-select.show-calender > .tab-head .start-btn > span {
+        color: inherit; }
     .range-picker .custom-select.show-calender > .tab-head span {
       color: #ccc1c1;
       width: 50%; }
@@ -407,13 +431,25 @@
     bottom: 0;
     width: 100%; } }
 
-/* 
+/*
 	Input container and button postion css
  */
-.sm-input-container .sm-picker-icon {
-  position: absolute;
-  top: 0%;
-  left: 93%; }
+.sm-input-container {
+  /* create space for button on the right */ }
+  .sm-input-container .sm-picker-icon {
+    position: absolute;
+    top: 0%;
+    left: 93%; }
+  .sm-input-container .sm-picker-button {
+    /*margin: 0;*/
+    padding: 8px 0;
+    /*width: 24px;*/
+    position: absolute;
+    top: -2px; }
+  .sm-input-container .sm-input-align-text-right {
+    text-align: right; }
+  .sm-input-container .sm-input-align-for-button {
+    margin-left: -32px; }
 
 .picker-container {
   border-radius: 2px; }
@@ -429,11 +465,12 @@
           .picker-container .container md-toolbar.md-height.landscape .year-header {
             margin: 10px;
             font-size: 16px; }
+          .picker-container .container md-toolbar.md-height.landscape .time-header {
+            font-size: 40px;
+            margin: 10px auto; }
           .picker-container .container md-toolbar.md-height.landscape .date-time-header {
             font-size: 28px;
-            font-weight: bold;
-            text-align: left;
-            margin: 0px 0 15px 10px; }
+            margin: 0 0 15px 10px; }
       .picker-container .container md-toolbar.md-height {
         padding: 5px 10px; }
         .picker-container .container md-toolbar.md-height.portrait {
@@ -441,14 +478,15 @@
           .picker-container .container md-toolbar.md-height.portrait .year-header {
             margin: 10px 0;
             font-size: 16px; }
+          .picker-container .container md-toolbar.md-height.portrait .time-header {
+            font-size: 40px;
+            margin: 10px auto; }
           .picker-container .container md-toolbar.md-height.portrait .date-time-header {
-            font-size: 32px;
-            font-weight: bold;
-            text-align: left; }
+            font-size: 32px; }
 
 .date-picker {
   width: 300px;
-  height: 270px; }
+  height: 310px; }
   .date-picker .cal-link {
     font-size: 0.7em;
     text-align: center;
@@ -524,19 +562,23 @@
       background-color: #E0E0E0; }
 
 .time-picker {
-  width: 300px; }
+  width: 300px;
+  height: 270px; }
   .time-picker .navigation {
-    height: 25px; }
+    height: 35px; }
     .time-picker .navigation .md-button {
       text-transform: capitalize;
       font-weight: bold;
       margin: 0; }
   .time-picker .time-md-repeat {
     width: 70px;
-    height: 239px; }
+    height: 235px; }
     .time-picker .time-md-repeat .repeated-item {
       width: 34px;
-      margin: 0 auto; }
+      margin: 0 auto;
+      box-sizing: border-box;
+      height: 34px;
+      overflow: hidden; }
       .time-picker .time-md-repeat .repeated-item > .md-button {
         margin: 2px; }
         .time-picker .time-md-repeat .repeated-item > .md-button.md-icon-button {
@@ -579,6 +621,12 @@
     height: 43px;
     text-align: center;
     line-height: 35px; }
+    .range-picker .custom-select.show-calender > .tab-head .start-btn {
+      width: 50%;
+      text-decoration: inherit;
+      color: inherit; }
+      .range-picker .custom-select.show-calender > .tab-head .start-btn > span {
+        color: inherit; }
     .range-picker .custom-select.show-calender > .tab-head span {
       color: #ccc1c1;
       width: 50%; }
