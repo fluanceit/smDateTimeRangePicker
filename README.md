@@ -2,8 +2,13 @@
 
 Picker are design to be used with Angular Material.
 
-- for [Demo](http://mominsamir.github.io/smDateTimeRangePicker/)
+- for [Demo](https://mominsamir.github.io/date-time-picker/#/home)
 - [plunker](http://plnkr.co/edit/2ePb5nf8vH71iH5byP7q?p=preview)
+
+## Build
+
+1. npm install (use node v8.17.0)
+2. gulp build
 
 ## Requirements
 

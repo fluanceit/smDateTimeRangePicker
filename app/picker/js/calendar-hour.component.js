@@ -2,7 +2,7 @@
 (function(){
 	'use strict';
 
-	function TimePicker(){
+	function TimePickerComponent(){
 		return {
 			restrict: 'E',
 			replace: true,
@@ -15,7 +15,7 @@
 			controller: ['$scope', '$mdUtil', 'smDatePickerLocale', TimePickerCtrl],
             controllerAs: 'vm',
             bindToController: true,
-            templateUrl: 'picker/calendar-hour-component.html'
+            templateUrl: 'picker/calendar-hour.component.html'
 		}
 	}
 
@@ -139,5 +139,5 @@
 	}
 
 	var app = angular.module('smDateTimeRangePicker');
-	app.directive('smTimeComponent', ['$timeout', TimePicker]);
+	app.directive('smTimeComponent', ['$timeout', TimePickerComponent]);
 })();

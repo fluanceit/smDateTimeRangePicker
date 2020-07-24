@@ -2,7 +2,9 @@
 (function(){
     'use strict';
 
-    function Calender(picker){
+    CalendarComponent.$inject = ['smDatePickerLocale'];
+
+    function CalendarComponent(picker){
         return {
             restrict: 'E',
             replace: false,
@@ -17,13 +19,13 @@
                 disableYearSelection:'@',
                 onDateSelectCall: '&'
             },
-            controller: ['$scope', '$timeout', 'smDatePickerLocale', '$mdMedia', CalenderCtrl],
+            controller: ['$scope', '$timeout', 'smDatePickerLocale', '$mdMedia', CalendarCtrl],
             controllerAs: 'vm',
-            templateUrl: 'picker/calendar-date-component.html'
+            templateUrl: 'picker/calendar-date.component.html'
         };
     }
 
-    var CalenderCtrl = function($scope, $timeout, picker, $mdMedia){
+    var CalendarCtrl = function($scope, $timeout, picker, $mdMedia){
         var self = this;
 
         self.$scope = $scope;
@@ -45,7 +47,7 @@
         }
     };
 
-    CalenderCtrl.prototype.$onInit = function(){
+    CalendarCtrl.prototype.$onInit = function(){
         var self = this;
 
         var MIN_YEAR = 1900;
@@ -69,7 +71,7 @@
         self.dateCellHeader= [];
         self.dateCells = [];
         self.monthList = self.picker.monthShortNames ? self.picker.monthShortNames : moment.monthsShort();
-        self.moveCalenderAnimation = '';
+        self.moveCalendarAnimation = '';
 
         self.format = angular.isUndefined(self.format) ? 'MM-DD-YYYY': self.format;
 
@@ -132,7 +134,7 @@
         self.showYear();
     };
 
-    CalenderCtrl.prototype.setView = function(){
+    CalendarCtrl.prototype.setView = function(){
         var self = this;
         self.headerDispalyFormat = 'ddd, MMM DD';
         switch(self.mode) {
@@ -150,18 +152,18 @@
     };
 
 
-    CalenderCtrl.prototype.showYear = function() {
+    CalendarCtrl.prototype.showYear = function() {
         var self = this;
         self.yearTopIndex = self.initialDate.year() - self.yearItems.START;
     };
 
 
-    CalenderCtrl.prototype.buildMonthCells = function(){
+    CalendarCtrl.prototype.buildMonthCells = function(){
         var self = this;
         self.monthCells = moment.months();
     };
 
-    CalenderCtrl.prototype.buildDateCells = function(){
+    CalendarCtrl.prototype.buildDateCells = function(){
         var self = this;
         var currentMonth = self.initialDate.month();
         var calStartDate = self.initialDate.clone().date(0).day(self.startDay).startOf('day');
@@ -221,27 +223,27 @@
         }
     };
 
-    CalenderCtrl.prototype.changePeriod = function(c){
+    CalendarCtrl.prototype.changePeriod = function(c){
         var self = this;
         if(c === 'p'){
             if(self.stopScrollPrevious) return;
-            self.moveCalenderAnimation='slideLeft';
+            self.moveCalendarAnimation='slideLeft';
             self.initialDate.subtract(1, 'M');
         }else{
             console.log(self.stopScrollNext);
             if(self.stopScrollNext) return;
-            self.moveCalenderAnimation='slideRight';
+            self.moveCalendarAnimation='slideRight';
             self.initialDate.add(1, 'M');
         }
 
         self.buildDateCells();
         self.$timeout(function(){
-            self.moveCalenderAnimation='';
+            self.moveCalendarAnimation='';
         }, 500);
     };
 
 
-    CalenderCtrl.prototype.selectDate = function(d, isDisabled){
+    CalendarCtrl.prototype.selectDate = function(d, isDisabled){
         var self = this;
         if (isDisabled) {
             return;
@@ -251,7 +253,7 @@
         self.$scope.$emit('calender:date-selected');
     };
 
-    CalenderCtrl.prototype.buildDateCellHeader = function(startFrom) {
+    CalendarCtrl.prototype.buildDateCellHeader = function(startFrom) {
         var self = this;
         var daysByName = self.picker.daysNames;
         var keys = [];
@@ -272,7 +274,7 @@
     Month Picker
     */
 
-    CalenderCtrl.prototype.changeView = function(view){
+    CalendarCtrl.prototype.changeView = function(view){
         var self = this;
         if(self.disableYearSelection){
             return;
@@ -288,7 +290,7 @@
     Year Picker
     */
 
-    CalenderCtrl.prototype.changeYear = function(yr, mn){
+    CalendarCtrl.prototype.changeYear = function(yr, mn){
         var self = this;
         self.initialDate.year(yr).month(mn);
         self.buildDateCells();
@@ -299,17 +301,17 @@
     Hour and Time
     */
 
-    CalenderCtrl.prototype.setHour = function(h){
+    CalendarCtrl.prototype.setHour = function(h){
         var self = this;
         self.currentDate.hour(h);
     };
 
-    CalenderCtrl.prototype.setMinute = function(m){
+    CalendarCtrl.prototype.setMinute = function(m){
         var self = this;
         self.currentDate.minute(m);
     };
 
-    CalenderCtrl.prototype.selectedDateTime = function(){
+    CalendarCtrl.prototype.selectedDateTime = function(){
         var self = this;
         if(self.mode === 'time')
             self.view='HOUR';
@@ -318,7 +320,7 @@
         self.$scope.$emit('calender:close');
     };
 
-    CalenderCtrl.prototype.closeDateTime = function(){
+    CalendarCtrl.prototype.closeDateTime = function(){
         var self = this;
         if(self.mode === 'time')
             self.view='HOUR';
@@ -328,9 +330,7 @@
         self.$scope.$emit('calender:close');
     };
 
-    Calender.$inject = ['smDatePickerLocale'];
-
-    CalenderCtrl.prototype.isPreviousDate = function(yearToCheck, monthToCheck)
+    CalendarCtrl.prototype.isPreviousDate = function(yearToCheck, monthToCheck)
     {
         var self = this;
         if(angular.isUndefined(self.minDate) || angular.isUndefined(yearToCheck) || angular.isUndefined(monthToCheck))
@@ -352,5 +352,5 @@
     };
 
     var app = angular.module('smDateTimeRangePicker', []);
-    app.directive('smCalendarComponent', Calender);
+    app.directive('smCalendarComponent', CalendarComponent);
 })();

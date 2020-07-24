@@ -2,7 +2,7 @@
 (function(){
 	'use strict';
 
-	function DatePickerDir($timeout, picker, $mdMedia, $window) {
+	function DatePickerComponent($timeout, picker, $mdMedia, $window) {
 		return {
 			restrict: 'E',
 			replace: false,
@@ -19,14 +19,14 @@
 				disableYearSelection: '@',
 				onSelectCall: '&'
 			},
-			controller: ['$scope', 'smDatePickerLocale', '$mdMedia', '$mdUtil', PickerCtrl],
+			controller: ['$scope', 'smDatePickerLocale', '$mdMedia', '$mdUtil', DatePickerCtrl],
 			controllerAs: 'vm',
 			bindToController: true,
-            templateUrl: 'picker/date-picker-component.html',
+            templateUrl: 'picker/date-picker.component.html',
 		};
 	}
 
-	var PickerCtrl = function($scope, picker, $mdMedia, $mdUtil) {
+	var DatePickerCtrl = function($scope, picker, $mdMedia, $mdUtil) {
         var self = this;
         
         self.scope = $scope;
@@ -39,7 +39,7 @@
 		self.colorIntention = picker.colorIntention;
 	};
 
-	PickerCtrl.prototype.$onInit = function() {
+	DatePickerCtrl.prototype.$onInit = function() {
 		var self = this;
 
 		if(angular.isUndefined(self.mode) || self.mode ===''){
@@ -63,7 +63,7 @@
 		self.setViewMode(self.mode);
 	};
 
-	PickerCtrl.prototype.setViewMode = function(mode){
+	DatePickerCtrl.prototype.setViewMode = function(mode){
 		var self = this;
 		switch(mode) {
 			case 'date':
@@ -84,7 +84,7 @@
 		}
 	};
 
-	PickerCtrl.prototype.setNextView = function(){
+	DatePickerCtrl.prototype.setNextView = function(){
 		var self = this;
 		switch (self.mode){
 			case 'date':
@@ -104,7 +104,7 @@
     /**
      * Update date/time
      */
-	PickerCtrl.prototype.selectedDateTime = function(){
+	DatePickerCtrl.prototype.selectedDateTime = function(){
         var self = this;
         var date = moment(self.selectedDate, self.format);
 		if(!date.isValid()){
@@ -122,7 +122,7 @@
     /**
      * Callback when date is selected
      */
-	PickerCtrl.prototype.dateSelected = function(date){
+	DatePickerCtrl.prototype.dateSelected = function(date){
 		var self = this;
 
         // update date of current date/time
@@ -144,7 +144,7 @@
     /**
      * Callback when time is selected
      */
-	PickerCtrl.prototype.timeSelected = function(time){
+	DatePickerCtrl.prototype.timeSelected = function(time){
         var self = this;
         
         // update time of current date/time
@@ -164,7 +164,7 @@
         }
 	};
 
-	PickerCtrl.prototype.closeDateTime = function(){
+	DatePickerCtrl.prototype.closeDateTime = function(){
 		var self = this;
 		self.view = 'DATE';
 		self.scope.$emit('calender:close');
@@ -251,6 +251,6 @@
 	}
 
 	var app = angular.module('smDateTimeRangePicker');
-	app.directive('smDatePickerComponent', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', DatePickerDir]);
+	app.directive('smDatePickerComponent', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', DatePickerComponent]);
 	//app.directive('smTimePickerCp', ['$timeout', 'smDatePickerLocale', '$mdMedia', '$window', TimePickerDir]);
 })();

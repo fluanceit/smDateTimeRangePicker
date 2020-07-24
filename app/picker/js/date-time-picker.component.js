@@ -1,7 +1,7 @@
-(function() {
+now(function() {
 
 /* global moment */
-function DateTimePicker($mdUtil, $mdMedia, $document) {
+function DateTimePickerComponent($mdUtil, $mdMedia, $document) {
     return {
         restrict: 'E',
         require: ['^ngModel', 'smDateTimePickerComponent'],
@@ -209,10 +209,18 @@ SMDateTimePickerCtrl.prototype.configureNgModel = function(ngModelCtrl) {
 
     self.ngModelCtrl.$parsers.push(function(viewValue) {
         var date = moment(viewValue, self.format);
+
+        // workaround for 'time': eg moment('12:11', 'HH:mm') returns current date (day, month, year), should use initialDate
+        if (self.mode == 'time' || self.format == 'HH:mm') {
+            date.year(self.initialDate.get('year'));
+            date.month(self.initialDate.get('month'));
+            date.date(self.initialDate.get('date'));
+        }
+
         var val = (date && date.isValid()) ? date.toDate() : null;
 
         // set local (initial date for the date/time picker)
-        self.initialDate = viewValue ? moment(viewValue, self.format) : moment(); // from view value, or current date
+        self.initialDate = viewValue ? date.clone() : moment(); // from view value, or current date
         
         return val;
     });
@@ -399,7 +407,7 @@ function DateTimeValidator () {
 
 
 var app = angular.module('smDateTimeRangePicker');
-app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', DateTimePicker]);
+app.directive('smDateTimePickerComponent', ['$mdUtil', '$mdMedia', '$document', DateTimePickerComponent]);
 app.directive('smDateTimeValidator', DateTimeValidator);
 
 })();
