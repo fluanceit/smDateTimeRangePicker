@@ -2,7 +2,7 @@
 
 Picker are design to be used with Angular Material.
 
-- for [Demo](https://mominsamir.github.io/date-time-picker/#/home)
+- for [Demo](https://fluanceit.github.io/smDateTimeRangePicker)
 - [plunker](http://plnkr.co/edit/2ePb5nf8vH71iH5byP7q?p=preview)
 
 ## Build
